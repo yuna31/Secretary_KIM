@@ -21,7 +21,6 @@ import com.example.home.secretary_kim.R;
 
 import java.security.MessageDigest;
 
-
 /**
  * Created by YUNA on 2018-07-13.
  */
@@ -30,9 +29,6 @@ public class LoginActivity extends Activity {
 
     private static final String TAG = "OAuthSampleActivity";
 
-    /**
-     * client 정보를 넣어준다.
-     */
     private static String OAUTH_CLIENT_ID = "OEJ_xBOx60FqccYhV_AQ";
     private static String OAUTH_CLIENT_SECRET = "SEAA5rBGq8";
     private static String OAUTH_CLIENT_NAME = "네이버 아이디로 로그인";
@@ -44,10 +40,7 @@ public class LoginActivity extends Activity {
      * UI 요소들
      */
     private TextView mApiResultText;
-    private static TextView mOauthAT;
-    private static TextView mOauthRT;
-    private static TextView mOauthExpires;
-    private static TextView mOauthTokenType;
+
     private static TextView mOAuthState;
 
     private OAuthLoginButton mOAuthLoginButton;
@@ -81,10 +74,6 @@ public class LoginActivity extends Activity {
     private void initView() {
         mApiResultText = (TextView) findViewById(R.id.api_result_text);
 
-        mOauthAT = (TextView) findViewById(R.id.oauth_access_token);
-        mOauthRT = (TextView) findViewById(R.id.oauth_refresh_token);
-        mOauthExpires = (TextView) findViewById(R.id.oauth_expires);
-        mOauthTokenType = (TextView) findViewById(R.id.oauth_type);
         mOAuthState = (TextView) findViewById(R.id.oauth_state);
 
         mOAuthLoginButton = (OAuthLoginButton) findViewById(R.id.buttonOAuthLoginImg);
@@ -93,11 +82,12 @@ public class LoginActivity extends Activity {
         updateView();
     }
 
+    //로그아웃할때 표시됨
     private void updateView() {
-        mOauthAT.setText(mOAuthLoginInstance.getAccessToken(mContext));
-        mOauthRT.setText(mOAuthLoginInstance.getRefreshToken(mContext));
-        mOauthExpires.setText(String.valueOf(mOAuthLoginInstance.getExpiresAt(mContext)));
-        mOauthTokenType.setText(mOAuthLoginInstance.getTokenType(mContext));
+        Log.d(TAG, "updateView : mOauthAT" + mOAuthLoginInstance.getAccessToken(mContext));
+        Log.d(TAG, "updateView : mOauthRT" + mOAuthLoginInstance.getRefreshToken(mContext));
+        Log.d(TAG, "updateView : mOauthExpiresString" + String.valueOf(mOAuthLoginInstance.getExpiresAt(mContext)));
+        Log.d(TAG, "updateView : mOauthTokenType" + mOAuthLoginInstance.getTokenType(mContext));
         mOAuthState.setText(mOAuthLoginInstance.getState(mContext).toString());
     }
 
@@ -114,15 +104,19 @@ public class LoginActivity extends Activity {
         @Override
         public void run(boolean success) {
             if (success) {
+
                 String accessToken = mOAuthLoginInstance.getAccessToken(mContext);
                 String refreshToken = mOAuthLoginInstance.getRefreshToken(mContext);
                 long expiresAt = mOAuthLoginInstance.getExpiresAt(mContext);
                 String tokenType = mOAuthLoginInstance.getTokenType(mContext);
-                mOauthAT.setText(accessToken);
-                mOauthRT.setText(refreshToken);
-                mOauthExpires.setText(String.valueOf(expiresAt));
-                mOauthTokenType.setText(tokenType);
+
+                Log.d(TAG, "OAuthLoginHandler : mOauthAT" + accessToken);
+                Log.d(TAG, "OAuthLoginHandler : mOauthRT" + refreshToken);
+                Log.d(TAG, "OAuthLoginHandler : mOauthExpires" + String.valueOf(expiresAt));
+                Log.d(TAG, "OAuthLoginHandler : mOauthTokenType" + tokenType);
+
                 mOAuthState.setText(mOAuthLoginInstance.getState(mContext).toString());
+
             } else {
                 String errorCode = mOAuthLoginInstance.getLastErrorCode(mContext).getCode();
                 String errorDesc = mOAuthLoginInstance.getLastErrorDesc(mContext);
@@ -139,6 +133,7 @@ public class LoginActivity extends Activity {
                 mOAuthLoginInstance.startOauthLoginActivity(LoginActivity.this, mOAuthLoginHandler);
                 break;
             }
+            /*
             case R.id.buttonVerifier: {
                 new RequestApiTask().execute();
                 break;
@@ -147,6 +142,7 @@ public class LoginActivity extends Activity {
                 new RefreshTokenTask().execute();
                 break;
             }
+            */
             case R.id.buttonOAuthLogout: {
                 mOAuthLoginInstance.logout(mContext);
                 updateView();
