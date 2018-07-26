@@ -2,12 +2,8 @@ package com.example.home.secretary_kim;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -17,9 +13,6 @@ import android.widget.Toast;
 import com.nhn.android.naverlogin.OAuthLogin;
 import com.nhn.android.naverlogin.OAuthLoginHandler;
 import com.nhn.android.naverlogin.ui.view.OAuthLoginButton;
-import com.example.home.secretary_kim.R;
-
-import java.security.MessageDigest;
 
 /**
  * Created by YUNA on 2018-07-13.
@@ -54,8 +47,6 @@ public class LoginActivity extends Activity {
 
         initData();
         initView();
-
-        this.setTitle("OAuthLoginSample Ver." + OAuthLogin.getVersion());
     }
 
     private void initData() {
@@ -176,7 +167,7 @@ public class LoginActivity extends Activity {
             updateView();
         }
     }
-
+/*
     private class RequestApiTask extends AsyncTask<Void, Void, String> {
         @Override
         protected void onPreExecute() {
@@ -205,4 +196,5 @@ public class LoginActivity extends Activity {
             updateView();
         }
     }
+    */
 }
