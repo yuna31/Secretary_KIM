@@ -11,12 +11,18 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
         <Button
             android:id="@+id/loginbutton"
             style="@style/Button.Menu"
             android:text="로그인" />
+
+        <Button
+            android:id="@+id/bluetooth_btn"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="블루투스"/>
 
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

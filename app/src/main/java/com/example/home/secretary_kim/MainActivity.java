@@ -28,6 +28,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        Button bluetooth_btn = (Button)findViewById(R.id.bluetooth_btn);
+        bluetooth_btn.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(
+                        getApplicationContext(), BluetoothActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 }
 
