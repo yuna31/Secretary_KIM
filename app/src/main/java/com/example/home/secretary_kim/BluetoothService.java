@@ -261,12 +261,36 @@ public class BluetoothService {
         public void run(){
             Log.i(TAG, "BEGIN mConnectedThread");
             byte[] buffer = new byte[1024]; //얘는 크기가 왜 1024일까
-            int bytes;  //이건 또 뭘까
+            int bytes = 0;  //이건 또 뭘까
 
             while(true){
                 try {
+                    int tmp = mmInStream.available();
+
+                    if(tmp > 0) {
+                        byte[] packetBytes = new byte[tmp];
+
+                        mmInStream.read(packetBytes);
+
+                        for (int i = 0; i < tmp; i++) {
+                            if (packetBytes[i] == '\n') {
+                                byte[] encodedBytes = new byte[bytes];
+                                System.arraycopy(buffer, 0, encodedBytes, 0,
+                                        encodedBytes.length);
+
+                                String recvMessage = new String(encodedBytes, "UTF-8");
+                                bytes = 0;
+
+                                Log.d(TAG, "recv message: " + recvMessage);
+                            } else {
+                                buffer[bytes++] = packetBytes[i];
+                            }
+                        }
+                    }
+                    /*
                     bytes = mmInStream.read(buffer);
                     Log.d(TAG, "bytes : " + bytes); //반환값 확인 좀 해보자
+                    */
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);
                     connectionLost();
