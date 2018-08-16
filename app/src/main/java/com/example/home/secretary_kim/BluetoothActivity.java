@@ -2,6 +2,8 @@ package com.example.home.secretary_kim;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -30,11 +32,10 @@ public class BluetoothActivity  extends AppCompatActivity {
 
     private static final boolean D = true;
     public static final int MESSAGE_STATE_CHANGE = 1;
-    public static final int MESSAGE_WRITE = 2;
+    public static final int MESSAGE_READ = 2;
+    public static final int MESSAGE_WRITE = 3;
 
     public static final int MODE_REQUEST = 1;
-
-    //private int mSeletedBtn;
 
     private static final int STATE_SENDING = 1;
     private static final int STATE_NO_SENDING = 2;
@@ -56,11 +57,22 @@ public class BluetoothActivity  extends AppCompatActivity {
                         case BluetoothService.STATE_FAIL:
                             Toast.makeText(getApplicationContext(), "블루투스 연결 실패", Toast.LENGTH_SHORT).show();
                             break;
-
                     }
                     break;
-                case MESSAGE_WRITE:
+                case MESSAGE_READ:
+                    Log.d(TAG, "MESSAGE_READ");
+                    Toast.makeText(getApplicationContext(), "메세지 읽는 중", Toast.LENGTH_SHORT).show();
 
+                    byte[] buf = (byte[]) msg.obj;
+                    String readmsg = new String(buf, 0, msg.arg1);
+                    Log.d(TAG, "핸들러 : " + readmsg);
+
+                    setImg_view(buf);
+
+                    break;
+                case MESSAGE_WRITE:
+                    Log.d(TAG, "MESSAGE_WRITE");
+                    Toast.makeText(getApplicationContext(), "메세지 쓰는 중", Toast.LENGTH_SHORT).show();
                     break;
             }
         }
@@ -82,6 +94,8 @@ public class BluetoothActivity  extends AppCompatActivity {
             bluetoothService = new BluetoothService(this, mHandler);
             mOutStringBuffer = new StringBuffer("");
         }
+
+        img_view = (ImageView) findViewById(R.id.img_view);
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data){
@@ -120,7 +134,7 @@ public class BluetoothActivity  extends AppCompatActivity {
                     break;
                 case R.id.cam_btn:
                     if(bluetoothService.getState() == BluetoothService.STATE_CONNECTED){
-                        sendMessage("16", MODE_REQUEST);
+                        sendMessage("1", MODE_REQUEST);
                     }
                     else{
                         Toast.makeText(getApplicationContext(), "블루투스 연결 필요", Toast.LENGTH_SHORT).show();
@@ -134,6 +148,12 @@ public class BluetoothActivity  extends AppCompatActivity {
         }
 
     };
+
+    public void setImg_view(byte[] buffer){ //메소드 호출되는 위치 수정 필요
+        Bitmap bmp;
+        bmp = BitmapFactory.decodeByteArray(buffer, 0, buffer.length);
+        img_view.setImageBitmap(bmp);
+    }
 
     private synchronized void sendMessage(String message, int mode){    //안드로이드 -> 아두이노
         if(mSendingState == STATE_SENDING){
@@ -152,7 +172,7 @@ public class BluetoothActivity  extends AppCompatActivity {
         }
 
         if(message.length() > 0){
-            if(message == "16"){
+            if(message == "1"){
                 int msg = Integer.parseInt(message);
 
                 byte[] send = ByteBuffer.allocate(Integer.SIZE/8).putInt(msg).array();  //사진 찍을려면 int 16 값이 넘어가야 되기 때문에 Str->Int->Byte 변형

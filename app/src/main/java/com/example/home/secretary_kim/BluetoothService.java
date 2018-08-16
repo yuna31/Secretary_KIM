@@ -265,24 +265,35 @@ public class BluetoothService {
 
             while(true){
                 try {
+                    //bytes = mmInStream.read(buffer);
+
+                    //mHandler.obtainMessage(MainActivity.MESSAGE_READ, bytes, -1, buffer).sendToTarget();
+
                     int tmp = mmInStream.available();
 
-                    if(tmp > 0) {
+                    //Log.d(TAG, "tmp : " + tmp);
+
+                    if(tmp > 0){
                         byte[] packetBytes = new byte[tmp];
+                        int t;
 
                         mmInStream.read(packetBytes);
 
-                        for (int i = 0; i < tmp; i++) {
-                            if (packetBytes[i] == '\n') {
+                        for(int i = 0; i < tmp; i++){
+                            if(packetBytes[i] == '\n'){
                                 byte[] encodedBytes = new byte[bytes];
                                 System.arraycopy(buffer, 0, encodedBytes, 0,
                                         encodedBytes.length);
 
+                                t = bytes;
                                 String recvMessage = new String(encodedBytes, "UTF-8");
                                 bytes = 0;
 
                                 Log.d(TAG, "recv message: " + recvMessage);
-                            } else {
+
+                                mHandler.obtainMessage(BluetoothActivity.MESSAGE_READ, t, -1, encodedBytes).sendToTarget();
+                            }
+                            else{
                                 buffer[bytes++] = packetBytes[i];
                             }
                         }
