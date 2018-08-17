@@ -1,5 +1,4 @@
-package com.example.s0woo.tempvoice;
-//package com.example.home.secretary_kim;
+package com.example.home.secretary_kim;
 
 import android.Manifest;
 import android.app.Activity;
