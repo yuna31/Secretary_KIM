@@ -5,8 +5,8 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
-import android.os.Handler;
 import android.util.Log;
+import android.os.Handler;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,12 +17,13 @@ public class BluetoothService {
 
     private static final int REQUEST_CONNECT_DEVICE = 1;
     private static final int REQUEST_ENABLE_BT = 2;
+
     private static final String TAG = "BluetoothService";
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     private BluetoothAdapter btAdapter;
-    private Activity mActivity;
     private Handler mHandler;
+    private Activity mActivity;
 
     public static final int STATE_NONE = 1;
     public static final int STATE_LISTEN = 2;
@@ -31,11 +32,12 @@ public class BluetoothService {
     public static final int STATE_FAIL = 7;
 
     private int mState;
+    public int mMode;
 
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
 
-    public int mMode;
+    public byte[] imgBuffer = new byte[393216];
 
     public BluetoothService(Activity activity, Handler handler){
         mActivity = activity;
@@ -116,25 +118,18 @@ public class BluetoothService {
         Log.d(TAG, "connect to : " + device);
 
         if(mState == STATE_CONNECTING){
-            if(mConnectThread == null){
-
-            }
-            else{
+            if(mConnectThread != null){
                 mConnectThread.cancel();
                 mConnectThread = null;
             }
         }
 
-        if(mConnectedThread == null){
-
-        }
-        else{
+        if(mConnectedThread != null){
             mConnectedThread.cancel();
             mConnectedThread = null;
         }
 
         mConnectThread = new ConnectThread(device);
-
         mConnectThread.start();
         setState(STATE_CONNECTING);
     }
@@ -142,25 +137,18 @@ public class BluetoothService {
     public synchronized void connected(BluetoothSocket socket, BluetoothDevice device){
         Log.d(TAG, "connected");
 
-        if(mConnectThread == null){
-
-        }
-        else{
+        if(mConnectThread != null){
             mConnectThread.cancel();
             mConnectThread = null;
         }
 
-        if(mConnectedThread == null){
-
-        }
-        else{
+        if(mConnectedThread != null){
             mConnectedThread.cancel();
             mConnectedThread = null;
         }
 
         mConnectedThread = new ConnectedThread(socket);
         mConnectedThread.start();
-
         setState(STATE_CONNECTED);
     }
 
@@ -180,7 +168,7 @@ public class BluetoothService {
         setState(STATE_NONE);
     }
 
-    private class ConnectThread extends Thread{
+    private class ConnectThread extends Thread {
         private final BluetoothSocket mmSocket;
         private final BluetoothDevice mmDevice;
 
@@ -193,8 +181,8 @@ public class BluetoothService {
             } catch (IOException e) {
                 Log.d(TAG, "create() failed", e);
             }
-            mmSocket = tmp;
 
+            mmSocket = tmp;
         }
 
         public void run(){
@@ -236,7 +224,7 @@ public class BluetoothService {
         }
     }
 
-    private class ConnectedThread extends Thread{
+    private class ConnectedThread extends Thread {
         private final BluetoothSocket mmSocket;
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
@@ -261,53 +249,32 @@ public class BluetoothService {
         public void run(){
             Log.i(TAG, "BEGIN mConnectedThread");
             byte[] buffer = new byte[1024]; //얘는 크기가 왜 1024일까
-            int bytes = 0;  //이건 또 뭘까
+            int bytes;  //이건 또 뭘까
+            int tmp = 0;
 
             while(true){
                 try {
-                    //bytes = mmInStream.read(buffer);
+                    bytes = mmInStream.read(buffer);
 
-                    //mHandler.obtainMessage(MainActivity.MESSAGE_READ, bytes, -1, buffer).sendToTarget();
+                    for(int i = 0; i < bytes; i++){
+                        imgBuffer[tmp] = buffer[i];
+                        tmp++;
 
-                    int tmp = mmInStream.available();
-
-                    //Log.d(TAG, "tmp : " + tmp);
-
-                    if(tmp > 0){
-                        byte[] packetBytes = new byte[tmp];
-                        int t;
-
-                        mmInStream.read(packetBytes);
-
-                        for(int i = 0; i < tmp; i++){
-                            if(packetBytes[i] == '\n'){
-                                byte[] encodedBytes = new byte[bytes];
-                                System.arraycopy(buffer, 0, encodedBytes, 0,
-                                        encodedBytes.length);
-
-                                t = bytes;
-                                String recvMessage = new String(encodedBytes, "UTF-8");
-                                bytes = 0;
-
-                                Log.d(TAG, "recv message: " + recvMessage);
-
-                                mHandler.obtainMessage(BluetoothActivity.MESSAGE_READ, t, -1, encodedBytes).sendToTarget();
-                            }
-                            else{
-                                buffer[bytes++] = packetBytes[i];
+                        if(i > 0){
+                            if(buffer[i] == (byte)0xD9){
+                                if(buffer[i-1] == (byte)0xFF){
+                                    mHandler.obtainMessage(BluetoothActivity.MESSAGE_READ, bytes, -1, buffer).sendToTarget();
+                                }
                             }
                         }
                     }
-                    /*
-                    bytes = mmInStream.read(buffer);
-                    Log.d(TAG, "bytes : " + bytes); //반환값 확인 좀 해보자
-                    */
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);
                     connectionLost();
                     break;
                 }
             }
+
         }
 
         public void write(byte[] buffer, int mode){

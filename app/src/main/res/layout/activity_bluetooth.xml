@@ -20,9 +20,9 @@
         android:layout_below="@+id/bluetooth_btn"/>
 
     <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="320dp"
+        android:layout_height="240dp"
         android:id="@+id/img_view"
-        android:layout_below="@id/cam_btn"/>
+        android:layout_below="@id/cam_btn" />
 
 </RelativeLayout>
