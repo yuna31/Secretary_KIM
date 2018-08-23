@@ -38,6 +38,9 @@
         
         <activity android:name=".SpeechActivity" />
 
+        <activity android:name=".DeviceListActivity"
+            android:theme="@android:style/Theme.DeviceDefault.Dialog">
+        </activity>
 
     </application>
 

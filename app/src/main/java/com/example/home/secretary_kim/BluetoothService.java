@@ -38,6 +38,7 @@ public class BluetoothService {
     private ConnectedThread mConnectedThread;
 
     public byte[] imgBuffer = new byte[393216];
+    public StringBuffer strBuffer = null;
 
     public BluetoothService(Activity activity, Handler handler){
         mActivity = activity;
@@ -249,11 +250,38 @@ public class BluetoothService {
         public void run(){
             Log.i(TAG, "BEGIN mConnectedThread");
             byte[] buffer = new byte[1024]; //얘는 크기가 왜 1024일까
-            int bytes;  //이건 또 뭘까
+            int bytes;  //mmInStream 으로 읽어오는 바이트 수
             int tmp = 0;
 
             while(true){
                 try {
+                    /*
+                    bytes = mmInStream.read(buffer);
+
+                    if(bytes > 0){
+                        for(int i = 0; i < bytes; i++){
+                            imgBuffer[tmp] = buffer[i];
+                            tmp++;
+
+                            if(i > 0) {
+                                if (buffer[i] == (byte) 0xD9 && buffer[i - 1] == (byte) 0xFF) {
+                                    byte[] tBuf = new byte[tmp - 2];
+                                    System.arraycopy(imgBuffer, 0, tBuf, 0, tBuf.length);
+                                    String t = new String(tBuf, "UTF-8");   //아스키 코드로 변환
+                                    String t2 = asciiToHex(t);  //아스키 -> Hex 변환
+                                    imgBuffer = new byte[393216];
+                                    bytes = 0;
+
+                                    //Log.d(TAG, tBuf.toString());
+
+                                    //mHandler.obtainMessage(BluetoothActivity.MESSAGE_READ, tBuf.length, -1, tBuf).sendToTarget();
+                                    mHandler.obtainMessage(BluetoothActivity.MESSAGE_READ, t2).sendToTarget();
+                                }
+                            }
+                        }
+                    }
+                    */
+
                     bytes = mmInStream.read(buffer);
 
                     for(int i = 0; i < bytes; i++){
@@ -261,10 +289,17 @@ public class BluetoothService {
                         tmp++;
 
                         if(i > 0){
-                            if(buffer[i] == (byte)0xD9){
-                                if(buffer[i-1] == (byte)0xFF){
-                                    mHandler.obtainMessage(BluetoothActivity.MESSAGE_READ, bytes, -1, buffer).sendToTarget();
-                                }
+                            if(buffer[i] == (byte)0xD9 && buffer[i-1] == (byte)0xFF){
+                                //if(buffer[i-1] == (byte)0xFF){
+                                Log.d(TAG, imgBuffer.toString());
+                                byte[] imgbuf = new byte[tmp-2];
+                                int size = tmp-2;
+                                System.arraycopy(imgBuffer, 0, imgbuf, 0, size);
+                                imgBuffer = new byte[393216];
+                                bytes = 0;
+
+                                mHandler.obtainMessage(BluetoothActivity.MESSAGE_READ, size, -1, imgbuf).sendToTarget();
+                                //  }
                             }
                         }
                     }
@@ -277,9 +312,9 @@ public class BluetoothService {
 
         }
 
-        public void write(byte[] buffer, int mode){
+        public void write(String buffer, int mode){
             try {
-                mmOutStream.write(buffer);
+                mmOutStream.write(buffer.getBytes());
                 mMode = mode;
 
                 if(mode == BluetoothActivity.MODE_REQUEST){
@@ -299,7 +334,18 @@ public class BluetoothService {
         }
     }
 
-    public void write(byte[] out, int mode){
+    private static String asciiToHex(String asciiValue)
+    {
+        char[] chars = asciiValue.toCharArray();
+        StringBuffer hex = new StringBuffer();
+        for (int i = 0; i < chars.length; i++)
+        {
+            hex.append(Integer.toHexString((int) chars[i]));
+        }
+        return hex.toString();
+    }
+
+    public void write(String out, int mode){
         ConnectedThread r;
 
         synchronized (this){

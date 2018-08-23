@@ -4,7 +4,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.ImageFormat;
 import android.graphics.Matrix;
+import android.graphics.Rect;
+import android.graphics.YuvImage;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -15,11 +18,13 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 
 public class BluetoothActivity  extends AppCompatActivity {
 
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "BluetoothActivity";
 
     private static final int REQUEST_CONNECT_DEVICE = 1;
     private static final int REQUEST_ENABLE_BT = 2;
@@ -42,11 +47,56 @@ public class BluetoothActivity  extends AppCompatActivity {
     private BluetoothService bluetoothService = null;
     private StringBuffer mOutStringBuffer;
 
+    private String imgStr;
+
+    private final Handler mHandler = new Handler(){
+        public void handleMessage(Message msg){
+            switch(msg.what){
+                case MESSAGE_STATE_CHANGE:
+                    if(D){
+                        Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
+                    }
+                    switch (msg.arg1){
+                        case BluetoothService.STATE_CONNECTED:
+                            Toast.makeText(getApplicationContext(), "블루투스 연결 성공", Toast.LENGTH_SHORT).show();
+                            break;
+                        case BluetoothService.STATE_CONNECTING:
+                            Toast.makeText(getApplicationContext(),"블루투스 연결 중", Toast.LENGTH_SHORT).show();
+                            break;
+                        case BluetoothService.STATE_FAIL:
+                            Toast.makeText(getApplicationContext(), "블루투스 연결 실패", Toast.LENGTH_SHORT).show();
+                            break;
+                    }
+                    break;
+                case MESSAGE_WRITE:
+                    Log.d(TAG, "MESSAGE_WRITE");
+                    Toast.makeText(getApplicationContext(), "메세지 쓰는 중", Toast.LENGTH_SHORT).show();
+                    break;
+                case MESSAGE_READ:
+                    /*
+                    String t = (String)msg.obj;
+                    if(t != null){
+                        Log.d(TAG, t);
+                        setImg(t);
+                    }*/
+                    byte[] t2 = (byte[])msg.obj;
+                    if(t2!=null){
+                        Log.d(TAG, t2.toString());
+                        setImg(t2);
+                    }
+                    break;
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate");
         setContentView(R.layout.activity_main);
+
+        img_view = (ImageView) findViewById(R.id.img_view);
+        img_view.setImageDrawable(getResources().getDrawable(R.drawable.ic_launcher_foreground));
 
         bluetooth_btn = (Button)findViewById(R.id.bluetooth_btn);
         bluetooth_btn.setOnClickListener(new Button.OnClickListener(){
@@ -123,12 +173,7 @@ public class BluetoothActivity  extends AppCompatActivity {
 
         if(message.length() > 0){
             if(message == "1"){
-                int msg = Integer.parseInt(message);
-
-                byte[] send = ByteBuffer.allocate(Integer.SIZE/8).putInt(msg).array();  //사진 찍을려면 int 16 값이 넘어가야 되기 때문에 Str->Int->Byte 변형
-                bluetoothService.write(send, mode);
-
-                mOutStringBuffer.setLength(0);
+                bluetoothService.write(message, mode);
             }
 
         }
@@ -137,11 +182,47 @@ public class BluetoothActivity  extends AppCompatActivity {
         notify();
     }
 
-    public void setImg(byte[] buf){
+    public void setImg(String t){
         img_view = (ImageView) findViewById(R.id.img_view);
+        byte[] buf = new BigInteger(t, 16).toByteArray();
+
+        YuvImage yuvImage = new YuvImage(buf, ImageFormat.NV21, 320, 240, null);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        yuvImage.compressToJpeg(new Rect(0, 0, 320, 240), 100, baos);
+        byte[] data = baos.toByteArray();
+
+        Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+        if (bmp != null) {
+            Toast.makeText(getApplicationContext(), "비트맵 생성 빠밤!!!!!!!!!!", Toast.LENGTH_LONG).show();
+
+            //Bitmap bmp2 = modiBMP(bmp);
+            img_view.setImageBitmap(bmp);
+        } else {
+            Toast.makeText(getApplicationContext(), "실패다 ㅅㅂ...", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void setImg(byte[] buf){
+
+/*
+        YuvImage yuvImage = new YuvImage(buf, ImageFormat.NV21, 320, 240, null);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        yuvImage.compressToJpeg(new Rect(0, 0, 320, 240), 100, baos);
+        byte[] data = baos.toByteArray();
+
+        Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+        */
+
         Bitmap bmp = BitmapFactory.decodeByteArray(buf, 0, buf.length);
-        Bitmap bmp2 = modiBMP(bmp);
-        img_view.setImageBitmap(bmp2);
+        if(bmp != null){
+            Toast.makeText(getApplicationContext(), "비트맵 생성!!!!!!!!!!!!", Toast.LENGTH_LONG).show();
+
+            //Bitmap bmp2 = modiBMP(bmp);
+            img_view.setImageBitmap(bmp);
+        }
+        else {
+            Toast.makeText(getApplicationContext(), "실패다 ㅅㅂ...", Toast.LENGTH_LONG).show();
+        }
     }
 
     public Bitmap modiBMP(Bitmap bmp){
@@ -154,36 +235,4 @@ public class BluetoothActivity  extends AppCompatActivity {
         Bitmap result = Bitmap.createBitmap(bmp, 0, 0, w, h, matrix, true);
         return result;
     }
-
-    private final Handler mHandler = new Handler(){
-        public void handleMessage(Message msg){
-            switch(msg.what){
-                case MESSAGE_STATE_CHANGE:
-                    if(D){
-                        Log.i(TAG, "MESSAGE_STATE_CHANGE: " + msg.arg1);
-                    }
-                    switch (msg.arg1){
-                        case BluetoothService.STATE_CONNECTED:
-                            Toast.makeText(getApplicationContext(), "블루투스 연결 성공", Toast.LENGTH_SHORT).show();
-                            break;
-                        case BluetoothService.STATE_CONNECTING:
-                            Toast.makeText(getApplicationContext(),"블루투스 연결 중", Toast.LENGTH_SHORT).show();
-                            break;
-                        case BluetoothService.STATE_FAIL:
-                            Toast.makeText(getApplicationContext(), "블루투스 연결 실패", Toast.LENGTH_SHORT).show();
-                            break;
-                    }
-                    break;
-                case MESSAGE_WRITE:
-                    Log.d(TAG, "MESSAGE_WRITE");
-                    Toast.makeText(getApplicationContext(), "메세지 쓰는 중", Toast.LENGTH_SHORT).show();
-                    break;
-                case MESSAGE_READ:
-                    byte[] buf = (byte[])msg.obj;
-                    setImg(buf);
-                    break;
-            }
-        }
-    };
-
 }
