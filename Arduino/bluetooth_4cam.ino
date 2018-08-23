@@ -1,3 +1,4 @@
+
 #include <Wire.h>
 #include <ArduCAM.h>
 #include <SPI.h>
@@ -148,10 +149,9 @@ void loop() {
 
   if (Serial1.available()) {
     temp = Serial1.read();
-    Serial1.println(temp);
+    Serial.println(temp);
 
     switch (temp) {
-      //Serial.println("start");
       case 49:
         Serial.println(F("CAMs start single shoot"));
         if(cam1) send_bluetooth(myCAM1, 1);
@@ -183,12 +183,12 @@ void send_bluetooth(ArduCAM myCAM, int t) {
   length = myCAM.read_fifo_length();
 
   if (length >= 393216) {
-    Serial.println(F("Over size"));
+    //Serial.println(F("Over size"));
     myCAM.clear_fifo_flag();
     return;
   }
   if (length == 0) {
-    Serial.println(F("0 size"));
+    //Serial.println(F("0 size"));
     myCAM.clear_fifo_flag();
     return;
   }
@@ -211,17 +211,20 @@ void send_bluetooth(ArduCAM myCAM, int t) {
     }
 
     if ((temp == 0xD9) && (temp_last == 0xFF)) {
+      Serial1.write(temp_last);
+      Serial1.write(temp);
       break;
     }
 
     delayMicroseconds(30);
   }
-
-  Serial1.println(F("\nEND"));
-  Serial.print(F("Capture Done "));
-  Serial.println(t);
+  
+//  Serial1.println(F("\nEND"));
+//  Serial.print(F("Capture Done "));
+//  Serial.println(t);
 
   myCAM.CS_HIGH();
   myCAM.clear_fifo_flag();
   is_header = false;
 }
+
