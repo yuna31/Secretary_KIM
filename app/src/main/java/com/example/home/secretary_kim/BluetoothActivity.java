@@ -47,7 +47,7 @@ public class BluetoothActivity  extends AppCompatActivity {
     private BluetoothService bluetoothService = null;
     private StringBuffer mOutStringBuffer;
 
-    private String imgStr;
+    private Bitmap[] img = new Bitmap[4];
 
     private final Handler mHandler = new Handler(){
         public void handleMessage(Message msg){
@@ -73,17 +73,13 @@ public class BluetoothActivity  extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "메세지 쓰는 중", Toast.LENGTH_SHORT).show();
                     break;
                 case MESSAGE_READ:
-                    /*
-                    String t = (String)msg.obj;
-                    if(t != null){
-                        Log.d(TAG, t);
-                        setImg(t);
-                    }*/
+                    int tmp = msg.arg2;
                     byte[] t2 = (byte[])msg.obj;
                     if(t2!=null){
                         Log.d(TAG, t2.toString());
-                        setImg(t2);
+                        setImg(t2, tmp);
                     }
+
                     break;
             }
         }
@@ -182,49 +178,21 @@ public class BluetoothActivity  extends AppCompatActivity {
         notify();
     }
 
-    public void setImg(String t){
-        img_view = (ImageView) findViewById(R.id.img_view);
-        byte[] buf = new BigInteger(t, 16).toByteArray();
-
-        YuvImage yuvImage = new YuvImage(buf, ImageFormat.NV21, 320, 240, null);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        yuvImage.compressToJpeg(new Rect(0, 0, 320, 240), 100, baos);
-        byte[] data = baos.toByteArray();
-
-        Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-        if (bmp != null) {
-            Toast.makeText(getApplicationContext(), "비트맵 생성 빠밤!!!!!!!!!!", Toast.LENGTH_LONG).show();
-
-            //Bitmap bmp2 = modiBMP(bmp);
-            img_view.setImageBitmap(bmp);
-        } else {
-            Toast.makeText(getApplicationContext(), "실패다 ㅅㅂ...", Toast.LENGTH_LONG).show();
-        }
-    }
-
-    public void setImg(byte[] buf){
-
-/*
-        YuvImage yuvImage = new YuvImage(buf, ImageFormat.NV21, 320, 240, null);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        yuvImage.compressToJpeg(new Rect(0, 0, 320, 240), 100, baos);
-        byte[] data = baos.toByteArray();
-
-        Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-        */
-
+    public void setImg(byte[] buf, int tmp){
         Bitmap bmp = BitmapFactory.decodeByteArray(buf, 0, buf.length);
         if(bmp != null){
-            Toast.makeText(getApplicationContext(), "비트맵 생성!!!!!!!!!!!!", Toast.LENGTH_LONG).show();
-
-            //Bitmap bmp2 = modiBMP(bmp);
+            Toast.makeText(getApplicationContext(), "비트맵 생성!!!!!!!!!!!!" + tmp, Toast.LENGTH_LONG).show();
+            int t = tmp / 2;
+            img[t] = bmp;
             img_view.setImageBitmap(bmp);
         }
         else {
-            Toast.makeText(getApplicationContext(), "실패다 ㅅㅂ...", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "실패다 ㅅㅂ..." + tmp, Toast.LENGTH_LONG).show();
+            img_view.setImageDrawable(getResources().getDrawable(R.drawable.ic_launcher_foreground));
         }
     }
 
+    /*
     public Bitmap modiBMP(Bitmap bmp){
         ImageView tmp = (ImageView)findViewById(R.id.img_view);
         int w = bmp.getWidth();
@@ -235,4 +203,5 @@ public class BluetoothActivity  extends AppCompatActivity {
         Bitmap result = Bitmap.createBitmap(bmp, 0, 0, w, h, matrix, true);
         return result;
     }
+    */
 }

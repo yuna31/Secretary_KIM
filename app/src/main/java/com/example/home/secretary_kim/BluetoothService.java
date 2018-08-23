@@ -38,7 +38,7 @@ public class BluetoothService {
     private ConnectedThread mConnectedThread;
 
     public byte[] imgBuffer = new byte[393216];
-    public StringBuffer strBuffer = null;
+    public int cnt = 0;
 
     public BluetoothService(Activity activity, Handler handler){
         mActivity = activity;
@@ -290,16 +290,18 @@ public class BluetoothService {
 
                         if(i > 0){
                             if(buffer[i] == (byte)0xD9 && buffer[i-1] == (byte)0xFF){
-                                //if(buffer[i-1] == (byte)0xFF){
-                                Log.d(TAG, imgBuffer.toString());
+                                cnt++;
+                                Log.d(TAG, imgBuffer.toString() + " -> " + cnt);
                                 byte[] imgbuf = new byte[tmp-2];
                                 int size = tmp-2;
                                 System.arraycopy(imgBuffer, 0, imgbuf, 0, size);
-                                imgBuffer = new byte[393216];
-                                bytes = 0;
 
-                                mHandler.obtainMessage(BluetoothActivity.MESSAGE_READ, size, -1, imgbuf).sendToTarget();
-                                //  }
+                                //imgBuffer = new byte[393216];
+                                tmp = 0;
+
+                                if(cnt % 2 == 1) {
+                                    mHandler.obtainMessage(BluetoothActivity.MESSAGE_READ, size, cnt, imgbuf).sendToTarget();
+                                }
                             }
                         }
                     }
