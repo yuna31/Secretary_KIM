@@ -121,6 +121,7 @@ void setup() {
   //Set to JPEG capture mode and initialize the OV5642 module
   myCAM1.set_format(JPEG);
   myCAM1.InitCAM();
+  myCAM1.OV5642_set_JPEG_size(OV5642_320x240);  //사진 크기 지정
   myCAM1.write_reg(ARDUCHIP_TIM, VSYNC_LEVEL_MASK);   //VSYNC is active HIGH
   myCAM2.write_reg(ARDUCHIP_TIM, VSYNC_LEVEL_MASK);   //VSYNC is active HIGH
   myCAM3.write_reg(ARDUCHIP_TIM, VSYNC_LEVEL_MASK);   //VSYNC is active HIGH
@@ -158,6 +159,7 @@ void loop() {
         if(cam2) send_bluetooth(myCAM2, 2);
         if(cam3) send_bluetooth(myCAM3, 3);
         if(cam4) send_bluetooth(myCAM4, 4);
+        break;
       default:
         break;
     }
@@ -216,12 +218,12 @@ void send_bluetooth(ArduCAM myCAM, int t) {
       break;
     }
 
-    delayMicroseconds(30);
+    delayMicroseconds(50);
   }
   
 //  Serial1.println(F("\nEND"));
-//  Serial.print(F("Capture Done "));
-//  Serial.println(t);
+  Serial.print(F("Capture Done "));
+  Serial.println(t);
 
   myCAM.CS_HIGH();
   myCAM.clear_fifo_flag();
