@@ -6,41 +6,88 @@
     android:layout_height="match_parent"
     tools:context=".SpeechActivity">
 
-    <Button
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="start_button"
-        android:id="@+id/speechbutton"
-        android:layout_gravity="center"/>
+        android:orientation="vertical">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="cancel_button"
-        android:id="@+id/cancelbutton" />
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="stop_button"
-        android:layout_marginLeft="30dp"
-        android:id="@+id/stopbutton" />
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="restart_button"
-        android:layout_marginLeft="30dp"
-        android:id="@+id/restartbutton" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
+            <Button
+                android:id="@+id/speechbutton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="start_button" />
+
+            <Button
+                android:id="@+id/cancelbutton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="cancel_button" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="60dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/stopbutton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="stop_button" />
+
+            <Button
+                android:id="@+id/restartbutton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="restart_button" />
+
+        </LinearLayout>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="60dp"
+            android:id="@+id/uibutton"
+            android:text="ui_button" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:id="@+id/connectbutton"
+            android:text="connect_button" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:id="@+id/storagebutton"
+            android:text="storage_button" />
+
+    </LinearLayout>
+
+
+
+
+    <!-- 필요없나봄...
     <EditText
+        android:id="@+id/words_edit"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:minLines="3"
         android:layout_marginTop="16dp"
-        android:inputType="textMultiLine"
+        android:layout_weight="1"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        android:text="initial_words"
-        android:id="@+id/words_edit"
-        android:layout_weight="1" />
+        android:inputType="textMultiLine"
+        android:minLines="3"
+        android:text="initial_words" />
+     -->
 
 </LinearLayout>
