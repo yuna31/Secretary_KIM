@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "121228433800",
+    "firebase_url": "https://secretary-kim-s0woo.firebaseio.com",
+    "project_id": "secretary-kim-s0woo",
+    "storage_bucket": "secretary-kim-s0woo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:121228433800:android:d38a4808973adccf",
+        "android_client_info": {
+          "package_name": "com.example.home.secretary_kim"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "121228433800-b2lv8a9o6lf1gtfurn8014sf5ipt1u2t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDUjnB4l_g8piWziQWYeTVW9nwyE1UFays"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
