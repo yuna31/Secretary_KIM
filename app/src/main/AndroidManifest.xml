@@ -36,11 +36,28 @@
 
         </activity>
         
-        <activity android:name=".SpeechActivity" />
-
         <activity android:name=".DeviceListActivity"
             android:theme="@android:style/Theme.DeviceDefault.Dialog">
         </activity>
+        
+        <activity android:name=".SpeechActivity" />
+        
+        <activity android:name=".MakeConnActivity">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".S3UploadActivity" />
+
+        <activity android:name=".S3DownloadActivity" />
+
+        <service
+            android:name=".MyFirebaseInstanceIDService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
 
     </application>
 
