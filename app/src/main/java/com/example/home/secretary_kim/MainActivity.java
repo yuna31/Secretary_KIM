@@ -38,6 +38,17 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        
+        Button speech_btn = (Button)findViewById(R.id.speech_btn);
+        speech_btn.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(
+                        getApplicationContext(), SpeechActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 }
 
