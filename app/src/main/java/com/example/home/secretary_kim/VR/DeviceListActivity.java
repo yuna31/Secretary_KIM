@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.home.secretary_kim;
+package com.example.home.secretary_kim.VR;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -32,6 +32,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.example.home.secretary_kim.R;
 
 import java.util.Set;
 

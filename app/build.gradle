@@ -43,6 +43,8 @@ dependencies {
     implementation 'com.amazonaws:aws-android-sdk-s3:2.2.+'
     implementation 'com.amazonaws:aws-android-sdk-ddb:2.2.+'
     implementation 'com.amazonaws:aws-android-sdk-cognito:2.6.+'
+
+    implementation 'com.google.vr:sdk-panowidget:1.160.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

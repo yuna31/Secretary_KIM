@@ -1,13 +1,9 @@
-package com.example.home.secretary_kim;
+package com.example.home.secretary_kim.VR;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.ImageFormat;
-import android.graphics.Matrix;
-import android.graphics.Rect;
-import android.graphics.YuvImage;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -18,9 +14,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import java.io.ByteArrayOutputStream;
-import java.math.BigInteger;
-import java.nio.ByteBuffer;
+import com.example.home.secretary_kim.R;
 
 public class BluetoothActivity  extends AppCompatActivity {
 
@@ -42,12 +36,16 @@ public class BluetoothActivity  extends AppCompatActivity {
 
     private Button bluetooth_btn;
     private Button cam_btn;
+    private Button pano_btn;
     private ImageView img_view;
 
     private BluetoothService bluetoothService = null;
     private StringBuffer mOutStringBuffer;
 
-    private Bitmap[] img = new Bitmap[4];
+    private Bitmap[] imgArray = null;
+    private ImageActivity imgActivity;
+    public static Bitmap img = null;
+    public int cnt = 0;
 
     private final Handler mHandler = new Handler(){
         public void handleMessage(Message msg){
@@ -77,7 +75,7 @@ public class BluetoothActivity  extends AppCompatActivity {
                     byte[] t2 = (byte[])msg.obj;
                     if(t2!=null){
                         Log.d(TAG, t2.toString());
-                        setImg(t2, tmp);
+                        setImg(t2);
                     }
 
                     break;
@@ -114,12 +112,29 @@ public class BluetoothActivity  extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Log.i(TAG, "Start Capture");
+                //img_view.setImageDrawable(getResources().getDrawable(R.drawable.ic_launcher_foreground));
+                imgArray = new Bitmap[4];
+                cnt = 0;
                 if(bluetoothService.getState() == BluetoothService.STATE_CONNECTED){
                     sendMessage("1", MODE_REQUEST);
                 }
                 else{
                     Toast.makeText(getApplicationContext(), "블루투스 연결 필요", Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+
+        pano_btn = (Button)findViewById(R.id.pano_btn);
+        pano_btn.setOnClickListener(new Button.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                if(imgArray != null){
+                    panoramaImg();
+                }
+
+                Intent i = new Intent(getApplicationContext(), VrPanoramaActivity.class);
+                startActivityForResult(i,0);
             }
         });
 
@@ -178,30 +193,27 @@ public class BluetoothActivity  extends AppCompatActivity {
         notify();
     }
 
-    public void setImg(byte[] buf, int tmp){
+    public void setImg(byte[] buf){    //카메라에서 비트맵 이미지 추출
         Bitmap bmp = BitmapFactory.decodeByteArray(buf, 0, buf.length);
         if(bmp != null){
-            Toast.makeText(getApplicationContext(), "비트맵 생성!!!!!!!!!!!!" + tmp, Toast.LENGTH_LONG).show();
-            int t = tmp / 2;
-            img[t] = bmp;
-            img_view.setImageBitmap(bmp);
+            Toast.makeText(getApplicationContext(), "비트맵 생성!!!!!!!!!!!!" + cnt, Toast.LENGTH_SHORT).show();
+            //img_view.setImageBitmap(bmp);
+            imgArray[cnt] = bmp;
+            cnt++;
         }
         else {
-            Toast.makeText(getApplicationContext(), "실패다 ㅅㅂ..." + tmp, Toast.LENGTH_LONG).show();
-            img_view.setImageDrawable(getResources().getDrawable(R.drawable.ic_launcher_foreground));
+            Toast.makeText(getApplicationContext(), "실패다 ㅅㅂ...", Toast.LENGTH_SHORT).show();
         }
     }
 
-    /*
-    public Bitmap modiBMP(Bitmap bmp){
-        ImageView tmp = (ImageView)findViewById(R.id.img_view);
-        int w = bmp.getWidth();
-        int h = bmp.getHeight();
-        Matrix matrix = new Matrix();
-        float scaleWidth = (float)tmp.getWidth() / (float)w;
-        matrix.postScale(scaleWidth, scaleWidth);
-        Bitmap result = Bitmap.createBitmap(bmp, 0, 0, w, h, matrix, true);
-        return result;
+    public void panoramaImg(){  //파노라마 이미지 생성
+        imgActivity = new ImageActivity(imgArray);
+
+        img = imgActivity.makePanorama();
+
+        for(int i = 3; i >= 0; i--){
+            imgArray[i].recycle();
+            imgArray[i] = null;
+        }
     }
-    */
 }

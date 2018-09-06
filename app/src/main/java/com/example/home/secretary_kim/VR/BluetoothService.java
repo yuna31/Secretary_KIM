@@ -1,4 +1,4 @@
-package com.example.home.secretary_kim;
+package com.example.home.secretary_kim.VR;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
@@ -255,33 +255,6 @@ public class BluetoothService {
 
             while(true){
                 try {
-                    /*
-                    bytes = mmInStream.read(buffer);
-
-                    if(bytes > 0){
-                        for(int i = 0; i < bytes; i++){
-                            imgBuffer[tmp] = buffer[i];
-                            tmp++;
-
-                            if(i > 0) {
-                                if (buffer[i] == (byte) 0xD9 && buffer[i - 1] == (byte) 0xFF) {
-                                    byte[] tBuf = new byte[tmp - 2];
-                                    System.arraycopy(imgBuffer, 0, tBuf, 0, tBuf.length);
-                                    String t = new String(tBuf, "UTF-8");   //아스키 코드로 변환
-                                    String t2 = asciiToHex(t);  //아스키 -> Hex 변환
-                                    imgBuffer = new byte[393216];
-                                    bytes = 0;
-
-                                    //Log.d(TAG, tBuf.toString());
-
-                                    //mHandler.obtainMessage(BluetoothActivity.MESSAGE_READ, tBuf.length, -1, tBuf).sendToTarget();
-                                    mHandler.obtainMessage(BluetoothActivity.MESSAGE_READ, t2).sendToTarget();
-                                }
-                            }
-                        }
-                    }
-                    */
-
                     bytes = mmInStream.read(buffer);
 
                     for(int i = 0; i < bytes; i++){
@@ -299,9 +272,7 @@ public class BluetoothService {
                                 //imgBuffer = new byte[393216];
                                 tmp = 0;
 
-                                if(cnt % 2 == 1) {
-                                    mHandler.obtainMessage(BluetoothActivity.MESSAGE_READ, size, cnt, imgbuf).sendToTarget();
-                                }
+                                mHandler.obtainMessage(BluetoothActivity.MESSAGE_READ, size, cnt, imgbuf).sendToTarget();
                             }
                         }
                     }
