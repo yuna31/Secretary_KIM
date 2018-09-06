@@ -319,6 +319,15 @@ public class LoginActivity extends Activity {
             //og.e(TAG, "getAppKeyHash > name not found : " + e.toString());
         }
     }
+	
+	@Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (Session.getCurrentSession().handleActivityResult(requestCode, resultCode, data)) {
+            return;
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 
     private class SessionCallback implements ISessionCallback {
         @Override
