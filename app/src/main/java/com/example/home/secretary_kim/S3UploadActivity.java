@@ -1,11 +1,23 @@
 package com.example.home.secretary_kim;
 
+import android.Manifest;
 import android.content.ContentValues;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.amazonaws.AmazonClientException;
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
@@ -15,52 +27,89 @@ import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.PutObjectResult;
+import com.kakao.network.ErrorResult;
+import com.kakao.usermgmt.UserManagement;
+import com.kakao.usermgmt.callback.MeV2ResponseCallback;
+import com.kakao.usermgmt.response.MeV2Response;
+import com.kakao.util.helper.log.Logger;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by s0woo on 2018-08-20.
+ * Edited by s0woo on 2018-09-04.
  */
 
 public class S3UploadActivity extends AppCompatActivity {
+    String SenderEmail;
+    byte[] bytes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_s3upload);
 
-        CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(
-                getApplicationContext(),
-                "ap-northeast-2:29422a03-b373-4e0a-85e7-4c1a9a28d16d", // 자격 증명 풀 ID
-                Regions.AP_NORTHEAST_2 // 리전
-        );
+        //합치고나면 지워도되는
+        if (Build.VERSION.SDK_INT >= 23) {
 
-        AmazonS3 s3 = new AmazonS3Client(credentialsProvider);
-        TransferUtility transferUtility = new TransferUtility(s3, getApplicationContext());
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                System.out.println("Permission is granted");
+                //return true;
+            }else{
+                System.out.println("Permission is revoked");
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
 
-        s3.setRegion(Region.getRegion(Regions.AP_NORTHEAST_2));
-        s3.setEndpoint("s3.ap-northeast-2.amazonaws.com");
+                //return false;
+            }
+        }else{
+            Toast.makeText(this, "External Storage Permission is Grant", Toast.LENGTH_SHORT).show();
+            System.out.println("External Storage Permission is Grant ");
+            //return true;
+        }
 
-        String url = "http://13.209.64.57:8080/pushNoti.jsp";
+        new Thread() {
+            public void run() {
+                //받아온 파노라마로 수정필요 
+                Bitmap orgImage = BitmapFactory.decodeFile("/storage/emulated/0/test.jpg");
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                orgImage.compress(Bitmap.CompressFormat.PNG, 100, stream);
 
-        NetworkTask networkTask = new NetworkTask(url, null);
-        networkTask.execute();
+                //S3에 전송하고 bitmap을 byte[]로 변환해서 넣기
+                byte[] bytes = stream.toByteArray();
+                System.out.println("###########byte array : " + bytes);
+                System.out.println("###########byte array size : " + bytes.length);
+                uploadToS3("first file", bytes);
+            }
+        }.start();
 
+        Handler handler1 = new Handler();
+        handler1.postDelayed(new Runnable() {
+            @Override
+            public void run() {
 
-        /*
+            }
+        }, 1000);
+
+/*
         TransferObserver observer = transferUtility.upload(
                 "s0woo",     // 업로드 할 버킷 이름
-                OBJECT_KEY,    // 버킷에 저장할 파일의 이름
-                MY_FILE        // 버킷에 저장할 파일
+                OBJECT_KEY,    // 버킷에 저장할 파일의 이름 String
+                MY_FILE        // 버킷에 저장할 파일 File
         );
-
-
 
         observer.setTransferListener(new TransferListener() {
             @Override
@@ -78,11 +127,86 @@ public class S3UploadActivity extends AppCompatActivity {
                 ex.printStackTrace();
             }
         });
-        */
+*/
 
-        // 음성인식 된 파일 업로드
-        // 파일 업로드 할 때 파일 이름 환자 이름으로 해야할지..???... 그래야 서버에서 파악해서 노티 보낼 수 있을 것 같고...
+
+        //업로드 성공하면 다음 동작 수행해야함
+        requestMe();
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                String url = "http://13.209.64.57:8080/pushNoti.jsp";
+                NetworkTask networkTask = new NetworkTask(url, null);
+                networkTask.execute();
+            }
+        }, 1000);
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (Build.VERSION.SDK_INT >= 23) {
+            if(grantResults[0]== PackageManager.PERMISSION_GRANTED){
+                System.out.println("Permission: "+permissions[0]+ "was "+grantResults[0]);
+                //resume tasks needing this permission
+            }
+        }
+    }
+
+    public void uploadToS3(final String OBJECT_KEY, byte[] bis) {
+        System.out.println("In uploadToS3 function byte : " + bis);
+        CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(
+                getApplicationContext(),
+                "ap-northeast-2:29422a03-b373-4e0a-85e7-4c1a9a28d16d", // 자격 증명 풀 ID
+                Regions.AP_NORTHEAST_2 // 리전
+        );
+
+        AmazonS3 s3 = new AmazonS3Client(credentialsProvider);
+        TransferUtility transferUtility = new TransferUtility(s3, getApplicationContext());
+
+        s3.setRegion(Region.getRegion(Regions.AP_NORTHEAST_2));
+        s3.setEndpoint("s3.ap-northeast-2.amazonaws.com");
+
+        InputStream is = new ByteArrayInputStream(bis);
+
+        ObjectMetadata metadata = new ObjectMetadata();
+        //metadata.setContentType("image/jpeg");
+        Long contentLength = Long.valueOf(bis.length);
+        System.out.println("$$$$$long size :: " + contentLength);
+        metadata.setContentLength(contentLength);
+
+        PutObjectRequest putObjectRequest = new PutObjectRequest(
+                "s0woo",
+                OBJECT_KEY,
+                is,
+                metadata
+        );
+
+
+        try {
+            PutObjectResult putObjectResult = s3.putObject(putObjectRequest);
+        }catch (AmazonServiceException ase) {
+            System.out.println("Error Message:    " + ase.getMessage());
+            System.out.println("HTTP Status Code: " + ase.getStatusCode());
+            System.out.println("AWS Error Code:   " + ase.getErrorCode());
+            System.out.println("Error Type:       " + ase.getErrorType());
+            System.out.println("Request ID:       " + ase.getRequestId());
+        } catch (AmazonClientException ace) {
+            System.out.println("Error Message: " + ace.getMessage());
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+    }
+
 
     public class NetworkTask extends AsyncTask<Void, Void, String> {
         private String url;
@@ -119,7 +243,7 @@ public class S3UploadActivity extends AppCompatActivity {
         public String request(String _url, ContentValues _params) {
             HttpURLConnection urlConn = null;
             StringBuffer sbParams = new StringBuffer();
-            String userID = "ssss"; //수정할것
+            String userID = SenderEmail; //수정할것
 
             //StringBuffer에 파라미터 연결
             // 보낼 데이터가 없으면 파라미터를 비운다.
@@ -167,6 +291,35 @@ public class S3UploadActivity extends AppCompatActivity {
             return null;
         }
 
+    }
+
+    private void requestMe() {
+        List<String> keys = new ArrayList<>();
+        keys.add("kakao_account.email");
+
+        UserManagement.getInstance().me(keys, new MeV2ResponseCallback() {
+            @Override
+            public void onFailure(ErrorResult errorResult) {
+                String message = "failed to get user info. msg=" + errorResult;
+                Logger.d(message);
+            }
+
+            @Override
+            public void onSessionClosed(ErrorResult errorResult) {
+                Intent i = new Intent(getApplicationContext(), LoginActivity.class);
+                startActivityForResult(i, 0);
+                Toast.makeText(getApplicationContext(), "다시 로그인해주세요", Toast.LENGTH_LONG).show();
+                System.out.println("****** " + errorResult.getErrorMessage());
+            }
+
+            @Override
+            public void onSuccess(MeV2Response response) {
+                Logger.d("email: " + response.getKakaoAccount().getEmail());
+                SenderEmail = response.getKakaoAccount().getEmail();
+                //Toast.makeText(getApplicationContext(), "kakao email : " + response.getKakaoAccount().getEmail(), Toast.LENGTH_LONG).show();
+                //System.out.println("@@@@@@@@@@Email : " + tempEmail);
+            }
+        });
     }
 }
 
