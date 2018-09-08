@@ -250,8 +250,8 @@ public class SpeechActivity extends Activity implements View.OnClickListener, Sp
     //수정이 필요하다
     public void detachString(String result) {
         if(result.length()>7) {
-            String from = result.substring(0,2);
-            String to = result.substring(5,7);
+            String from = result.substring(0,3);
+            String to = result.substring(result.length()-4, result.length());
             //System.out.println("*************************************시작: "+ from + "도착" + to);
             Toast.makeText(getApplicationContext(),"시작: "+ from + " 도착: " + to, Toast.LENGTH_LONG).show();
 

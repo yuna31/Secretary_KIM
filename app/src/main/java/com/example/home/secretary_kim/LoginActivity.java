@@ -2,6 +2,7 @@ package com.example.home.secretary_kim;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
@@ -17,6 +18,7 @@ import android.widget.Toast;
 
 import com.kakao.auth.AuthType;
 import com.kakao.auth.ISessionCallback;
+import com.kakao.auth.Session;
 import com.kakao.network.ErrorResult;
 import com.kakao.usermgmt.LoginButton;
 import com.kakao.usermgmt.UserManagement;
@@ -68,6 +70,11 @@ public class LoginActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        /*
+        * 로그인 정보가 있으면 바로 UserActivity로 넘어가야됨 <- 사용자 정보도 같이 넘어가야되나?
+        */
+
         setContentView(R.layout.activity_login);
 
         mContext = this;

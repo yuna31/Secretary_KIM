@@ -41,15 +41,10 @@
             android:theme="@android:style/Theme.DeviceDefault.Dialog">
         </activity>
 
-        <activity android:name=".VR.VrPanoramaActivity"
-            android:screenOrientation="landscape"
-            android:enableVrMode="@string/gvr_vr_mode_component"
-            android:theme="@style/VrActivityTheme"
-            android:resizeableActivity="false"
-            android:configChanges="density|keyboardHidden|navigation|orientation|screenSize|uiMode"></activity>
+        <activity android:name=".VR.VrPanoramaActivity"></activity>
         
         <activity android:name=".SpeechActivity" />
-        
+
         <activity android:name=".VoiceRecoActivity" />
         
         <activity android:name=".MakeConnActivity">

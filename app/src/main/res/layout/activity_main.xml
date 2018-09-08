@@ -24,11 +24,11 @@
             android:layout_width="wrap_content"
             android:text="블루투스"/>
         
-        <Button
-            android:id="@+id/speech_btn"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:text="음성+DB"/>
+        <!--<Button-->
+            <!--android:id="@+id/speech_btn"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:text="음성+DB"/>-->
 
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

@@ -1,6 +1,7 @@
 package com.example.home.secretary_kim.VR;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -15,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.home.secretary_kim.R;
+import com.example.home.secretary_kim.SpeechActivity;
 
 public class BluetoothActivity  extends AppCompatActivity {
 
@@ -34,19 +36,25 @@ public class BluetoothActivity  extends AppCompatActivity {
     private static final int STATE_NO_SENDING = 2;
     private int mSendingState;
 
-    private Button bluetooth_btn;
+    public static final int NULL_IMGARRAY = 0;
+    public static final int NOT_NULL_IMGARRAY = 1;
+    public static int arrState;
+
+    private static final int CNT_4 = 4;
+
+    //private Button bluetooth_btn;
     private Button cam_btn;
-    private Button pano_btn;
-    private ImageView img_view;
+    private Button speech_btn;
 
     private BluetoothService bluetoothService = null;
     private StringBuffer mOutStringBuffer;
 
-    private Bitmap[] imgArray = null;
-    private ImageActivity imgActivity;
-    public static Bitmap img = null;
+    public static Bitmap[] imgArray = null;
     public int cnt = 0;
 
+    private ProgressDialog prBar;
+
+    //블루투스로 값 받아오는 핸들러
     private final Handler mHandler = new Handler(){
         public void handleMessage(Message msg){
             switch(msg.what){
@@ -83,28 +91,46 @@ public class BluetoothActivity  extends AppCompatActivity {
         }
     };
 
+    //ProgressDialog 핸들러
+    Handler prHandler = new Handler(){
+        public void handleMessage(Message msg){
+            if(msg.what == CNT_4){
+                prBar.dismiss();
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate");
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_bluetooth);
 
-        img_view = (ImageView) findViewById(R.id.img_view);
-        img_view.setImageDrawable(getResources().getDrawable(R.drawable.ic_launcher_foreground));
+        //화면 시작하자마자 블루투스 연결
+        if(bluetoothService.getDeviceState()){
+            bluetoothService.enableBluetooth();
+        }
+        else{
+            finish();
+        }
 
-        bluetooth_btn = (Button)findViewById(R.id.bluetooth_btn);
-        bluetooth_btn.setOnClickListener(new Button.OnClickListener(){
+//        bluetooth_btn = (Button)findViewById(R.id.bluetooth_btn);
+//        bluetooth_btn.setOnClickListener(new Button.OnClickListener(){
+//
+//            @Override
+//            public void onClick(View view) {
+//                if(bluetoothService.getDeviceState()){
+//                    bluetoothService.enableBluetooth();
+//                }
+//                else{
+//                    finish();
+//                }
+//            }
+//        });
 
-            @Override
-            public void onClick(View view) {
-                if(bluetoothService.getDeviceState()){
-                    bluetoothService.enableBluetooth();
-                }
-                else{
-                    finish();
-                }
-            }
-        });
+        prBar = new ProgressDialog(this);
+        prBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        prBar.setMessage("이미지 로딩중입니다");
 
         cam_btn = (Button)findViewById(R.id.cam_btn);
         cam_btn.setOnClickListener(new Button.OnClickListener(){
@@ -112,11 +138,13 @@ public class BluetoothActivity  extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Log.i(TAG, "Start Capture");
-                //img_view.setImageDrawable(getResources().getDrawable(R.drawable.ic_launcher_foreground));
                 imgArray = new Bitmap[4];
+                arrState = NULL_IMGARRAY;
                 cnt = 0;
+
                 if(bluetoothService.getState() == BluetoothService.STATE_CONNECTED){
                     sendMessage("1", MODE_REQUEST);
+                    prBar.show();
                 }
                 else{
                     Toast.makeText(getApplicationContext(), "블루투스 연결 필요", Toast.LENGTH_SHORT).show();
@@ -124,24 +152,16 @@ public class BluetoothActivity  extends AppCompatActivity {
             }
         });
 
-        pano_btn = (Button)findViewById(R.id.pano_btn);
-        pano_btn.setOnClickListener(new Button.OnClickListener() {
+        speech_btn = (Button)findViewById(R.id.speech_btn);
+        speech_btn.setOnClickListener(new View.OnClickListener(){
 
             @Override
             public void onClick(View view) {
-                if(imgArray != null){
-                    panoramaImg();
-                }
-
-                Intent i = new Intent(getApplicationContext(), VrPanoramaActivity.class);
-                startActivityForResult(i,0);
+                Intent intent = new Intent(
+                        getApplicationContext(), SpeechActivity.class);
+                startActivity(intent);
             }
         });
-
-        if(bluetoothService == null){
-            bluetoothService = new BluetoothService(this, mHandler);
-            mOutStringBuffer = new StringBuffer("");
-        }
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data){
@@ -193,27 +213,24 @@ public class BluetoothActivity  extends AppCompatActivity {
         notify();
     }
 
-    public void setImg(byte[] buf){    //카메라에서 비트맵 이미지 추출
+    //카메라에서 비트맵 이미지 가져오기
+    public void setImg(byte[] buf){
         Bitmap bmp = BitmapFactory.decodeByteArray(buf, 0, buf.length);
         if(bmp != null){
-            Toast.makeText(getApplicationContext(), "비트맵 생성!!!!!!!!!!!!" + cnt, Toast.LENGTH_SHORT).show();
-            //img_view.setImageBitmap(bmp);
+            //Toast.makeText(getApplicationContext(), "비트맵 생성!!!!!!!!!!!!" + cnt, Toast.LENGTH_SHORT).show();
             imgArray[cnt] = bmp;
             cnt++;
+            if(cnt==4){
+                prHandler.sendEmptyMessage(CNT_4);
+                arrState = NOT_NULL_IMGARRAY;
+
+                //사진 4장 -> VrPanoramaActivity로 넘어감
+                Intent i = new Intent(getApplicationContext(), VrPanoramaActivity.class);
+                startActivityForResult(i,0);
+            }
         }
         else {
-            Toast.makeText(getApplicationContext(), "실패다 ㅅㅂ...", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    public void panoramaImg(){  //파노라마 이미지 생성
-        imgActivity = new ImageActivity(imgArray);
-
-        img = imgActivity.makePanorama();
-
-        for(int i = 3; i >= 0; i--){
-            imgArray[i].recycle();
-            imgArray[i] = null;
+            //Toast.makeText(getApplicationContext(), "실패다 ㅅㅂ...", Toast.LENGTH_SHORT).show();
         }
     }
 }
