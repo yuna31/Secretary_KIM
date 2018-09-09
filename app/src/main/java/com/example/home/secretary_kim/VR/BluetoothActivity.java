@@ -41,8 +41,7 @@ public class BluetoothActivity  extends AppCompatActivity {
     public static int arrState;
 
     private static final int CNT_4 = 4;
-
-    //private Button bluetooth_btn;
+    private Button bluetooth_btn;
     private Button cam_btn;
     private Button speech_btn;
 
@@ -106,6 +105,11 @@ public class BluetoothActivity  extends AppCompatActivity {
         Log.d(TAG, "onCreate");
         setContentView(R.layout.activity_bluetooth);
 
+        if(bluetoothService == null){
+            bluetoothService = new BluetoothService(this, mHandler);
+            mOutStringBuffer = new StringBuffer("");
+        }
+
         //화면 시작하자마자 블루투스 연결
         if(bluetoothService.getDeviceState()){
             bluetoothService.enableBluetooth();
@@ -114,19 +118,19 @@ public class BluetoothActivity  extends AppCompatActivity {
             finish();
         }
 
-//        bluetooth_btn = (Button)findViewById(R.id.bluetooth_btn);
-//        bluetooth_btn.setOnClickListener(new Button.OnClickListener(){
-//
-//            @Override
-//            public void onClick(View view) {
-//                if(bluetoothService.getDeviceState()){
-//                    bluetoothService.enableBluetooth();
-//                }
-//                else{
-//                    finish();
-//                }
-//            }
-//        });
+        bluetooth_btn = (Button)findViewById(R.id.bluetooth_btn);
+        bluetooth_btn.setOnClickListener(new Button.OnClickListener(){
+
+            @Override
+            public void onClick(View view) {
+                if(bluetoothService.getDeviceState()){
+                    bluetoothService.enableBluetooth();
+                }
+                else{
+                    finish();
+                }
+            }
+        });
 
         prBar = new ProgressDialog(this);
         prBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);

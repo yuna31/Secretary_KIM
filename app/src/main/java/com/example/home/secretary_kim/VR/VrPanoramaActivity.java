@@ -43,13 +43,16 @@ public class VrPanoramaActivity extends Activity {
         panoramaView.loadImageFromBitmap(img, panoOptions);
         panoramaView.setDisplayMode(3);
 
+        //터치 -> 음성인식
         panoramaView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
+                Toast.makeText(getApplicationContext(), "토스트", Toast.LENGTH_SHORT).show();
                 //SpeechActivity 백그라운드로 실행 -> 핸들러 이용해야될 듯ㅅㅂ
                 //삐- 소리 후 음성 인식하기
                 //음성 인식이 완료되면 비트맵 이미지 변경 -> 좌표에만 빨간색 사각형 표시
                 //음성 인식 -> "전송" 이면 해당 비트맵 이미지 저장 후 전송
+
                 return true;
             }
         });
