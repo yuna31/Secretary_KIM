@@ -10,16 +10,16 @@ import android.util.Log;
 public class ImageActivity {
     private static final String TAG = "ImageActivity";
     private Bitmap imgArray[];
-    private static Bitmap img;
+    private Bitmap img;
 
-    public ImageActivity(){
+    public ImageActivity(Bitmap img){
         imgArray = null;
-        this.img = null;
+        this.img = img;
     }
 
     public ImageActivity(Bitmap[] img){
         imgArray = img;
-        this.img = null;
+        img = null;
     }
 
     //3:2 비율 이미지에 좌표 그리기 8*6
@@ -79,18 +79,31 @@ public class ImageActivity {
         Bitmap tmp = imgArray[0];
 
         for(int i = 0; i < 3; i++){
-            tmp = panomaraImg(tmp, imgArray[i+1], false);
+            tmp = panoramaImg(tmp, imgArray[i+1], false);
         }
 
-        tmp = panomaraImg(tmp, tmp, true);
+        tmp = panoramaImg(tmp, tmp, true);
 
-        img = tmp;
+        return tmp;
+    }
 
-        return img;
+    public Bitmap panoramaImg_just(){
+        Bitmap tmp = imgArray[0];
+
+        for(int i = 0; i < 3; i++){
+            tmp = panoramaImg(tmp, imgArray[i+1], false);
+        }
+
+        return tmp;
+    }
+
+    public Bitmap panoramaImg_result(String r1, String r2){
+        Bitmap tmp = drawRect(r1, r2);
+        return panoramaImg(tmp, tmp, true);
     }
 
     //비트맵 이미지 2장 연결
-    public Bitmap panomaraImg(Bitmap  bit1, Bitmap bit2, boolean mode){
+    public Bitmap panoramaImg(Bitmap  bit1, Bitmap bit2, boolean mode){
         Bitmap result = null;
 
         BitmapFactory.Options options = new BitmapFactory.Options();
@@ -121,9 +134,9 @@ public class ImageActivity {
     }
 
     //사각형 그리기
-    public Bitmap drawRect(Bitmap tmp, String r1, String r2){
+    public Bitmap drawRect(String r1, String r2){
         Bitmap result = null;
-        Bitmap bit = Bitmap.createBitmap(tmp).copy(Bitmap.Config.ARGB_8888, true);
+        Bitmap bit = Bitmap.createBitmap(img).copy(Bitmap.Config.ARGB_8888, true);
 
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inDither = true;
@@ -133,17 +146,18 @@ public class ImageActivity {
         float height = bit.getHeight();
         Log.i("ImageActivity", "width / height : " + width + " / " + height);
 
-        float wLength = width / 8;
-        float hLength = height / 6;
+        float wLength = width / (8f * 4f);
+        float hLength = height / 6f;
         Log.i("ImageActivity", "wLength / hLength : " + wLength + " / " + hLength);
 
-        float[] coorR1 = detachInt(r1, width, height, wLength, hLength);
-        float[] coorR2 = detachInt(r2, width, height, wLength, hLength);
+        float[] coorR1 = detachInt(r1, width / 4, height, wLength, hLength);
+        float[] coorR2 = detachInt(r2, width / 4, height, wLength, hLength);
 
         result = Bitmap.createScaledBitmap(bit, bit.getWidth(), bit.getHeight(), true);
         Canvas canvas = new Canvas(result);
         Paint p = new Paint();
-        p.setStrokeWidth(3f);
+        p.setStrokeWidth(5);
+        p.setStyle(Paint.Style.STROKE);
         p.setColor(Color.RED);
         canvas.drawRect(coorR1[0], coorR1[1], coorR1[2], coorR1[3], p);
         canvas.drawRect(coorR2[0], coorR2[1], coorR2[2], coorR2[3], p);
@@ -156,15 +170,17 @@ public class ImageActivity {
         int[] strint = new int[3];
         float[] result = new float[4];
         int tmp = Integer.parseInt(str);
+        Log.d(TAG, "detachInt : " + tmp);
 
         strint[0] = tmp / 100;  //100 자리 -> 사진 번호
-        strint[1] = (tmp - strint[0]) / 10; //10 자리 -> 가로 줄 번호
-        strint[2] = tmp - strint[0] - strint[1];    //1 자리 -> 세로 줄 번호
+        strint[1] = (tmp - (strint[0]*100)) / 10; //10 자리 -> 가로 줄 번호
+        strint[2] = tmp - (strint[0]*100) - (strint[1]*10);    //1 자리 -> 세로 줄 번호
 
-        result[0] = (strint[0]-1)*width+(strint[2]-1)*wLength;
-        result[1] = strint[1]*hLength;
+        result[0] = ((strint[0]-1)*width)+((strint[2]-1)*wLength);
+        result[1] = strint[1] * hLength;
         result[2] = result[0] + wLength;
         result[3] = result[1] + hLength;
+        Log.d(TAG, "result : " + result[0] + ", " + result[1] + ", " + result[2] + ", " + result[3]);
 
         return result;
     }

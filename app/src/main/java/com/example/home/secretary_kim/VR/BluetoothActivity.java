@@ -1,13 +1,16 @@
 package com.example.home.secretary_kim.VR;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -18,7 +21,9 @@ import android.widget.Toast;
 import com.example.home.secretary_kim.R;
 import com.example.home.secretary_kim.SpeechActivity;
 
-public class BluetoothActivity  extends AppCompatActivity {
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+
+public class BluetoothActivity extends AppCompatActivity {
 
     private static final String TAG = "BluetoothActivity";
 
@@ -225,6 +230,8 @@ public class BluetoothActivity  extends AppCompatActivity {
             imgArray[cnt] = bmp;
             cnt++;
             if(cnt==4){
+                checkPerm();
+
                 prHandler.sendEmptyMessage(CNT_4);
                 arrState = NOT_NULL_IMGARRAY;
 
@@ -235,6 +242,36 @@ public class BluetoothActivity  extends AppCompatActivity {
         }
         else {
             //Toast.makeText(getApplicationContext(), "실패다 ㅅㅂ...", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void checkPerm(){
+        //나중에 permission 분리할 수 있다면 하는걸로.. 처음 시작할 때 넣는게 나을 거 같다
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED
+                || ActivityCompat.checkSelfPermission(this, WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.RECORD_AUDIO)
+                    && ActivityCompat.shouldShowRequestPermissionRationale(this, WRITE_EXTERNAL_STORAGE)) {
+                ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+            } else {
+
+            }
+        } else {
+            //startUsingSpeechSDK();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case 1:
+                if (grantResults.length > 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                    //startUsingSpeechSDK();
+                } else {
+                    finish();
+                }
+                break;
+            default:
+                break;
         }
     }
 }

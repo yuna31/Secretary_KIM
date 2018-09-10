@@ -38,7 +38,7 @@ public class BluetoothService {
     private ConnectedThread mConnectedThread;
 
     public byte[] imgBuffer = new byte[393216];
-    public int cnt = 0;
+    //public int cnt = 0;
 
     public BluetoothService(Activity activity, Handler handler){
         mActivity = activity;
@@ -252,6 +252,7 @@ public class BluetoothService {
             byte[] buffer = new byte[1024]; //얘는 크기가 왜 1024일까
             int bytes;  //mmInStream 으로 읽어오는 바이트 수
             int tmp = 0;
+            int cnt = 0;
 
             while(true){
                 try {
