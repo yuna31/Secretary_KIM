@@ -6,13 +6,17 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -97,6 +101,29 @@ public class LoginActivity extends Activity {
             public void onClick(View v) {
                 // 카카오 로그인 요청
                 isKakaoLogin();
+            }
+        });
+	    
+	final RadioGroup rg = (RadioGroup)findViewById(R.id.radioGroup1);
+        Button b = (Button)findViewById(R.id.button1);
+
+        b.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                DBUserORSecretary SelectRole = new DBUserORSecretary(LoginActivity.this, "SelectRole.db", null, 1);
+                SQLiteDatabase dbRole;
+
+                dbRole = SelectRole.getWritableDatabase();
+                SelectRole.onCreate(dbRole);
+                ContentValues values = new ContentValues();
+
+
+                int id = rg.getCheckedRadioButtonId();
+                RadioButton rb = (RadioButton) findViewById(id);
+                Toast.makeText(getApplicationContext(), rb.getText().toString(), Toast.LENGTH_LONG).show();
+                values.put("role", rb.getText().toString());
+                dbRole.update("SelectRole", values, "1", null);
+                //dbRole.delete("SelectRole", "1", null);
+                System.out.println("중복체크용 : " + SelectRole.getResult());
             }
         });
     }
