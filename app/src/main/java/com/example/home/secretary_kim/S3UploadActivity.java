@@ -46,7 +46,9 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -57,6 +59,11 @@ import java.util.List;
 public class S3UploadActivity extends AppCompatActivity {
     String SenderEmail;
     byte[] bytes;
+    long mNow;
+    Date mDate;
+    SimpleDateFormat mFormat = new SimpleDateFormat("yyyyMMdd hhmmss");
+    String fileName;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,16 +90,20 @@ public class S3UploadActivity extends AppCompatActivity {
 
         new Thread() {
             public void run() {
-                //받아온 파노라마로 수정필요 
+                //받아온 파노라마로 수정필요
                 Bitmap orgImage = BitmapFactory.decodeFile("/storage/emulated/0/test.jpg");
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 orgImage.compress(Bitmap.CompressFormat.PNG, 100, stream);
 
                 //S3에 전송하고 bitmap을 byte[]로 변환해서 넣기
                 byte[] bytes = stream.toByteArray();
-                System.out.println("###########byte array : " + bytes);
-                System.out.println("###########byte array size : " + bytes.length);
-                uploadToS3("first file", bytes);
+                //System.out.println("###########byte array : " + bytes);
+                //System.out.println("###########byte array size : " + bytes.length);
+                mNow = System.currentTimeMillis();
+                mDate = new Date(mNow);
+                fileName = mFormat.format(mDate);
+                //System.out.println("###############fileName : " + fileName);
+                uploadToS3(fileName, bytes);
             }
         }.start();
 
@@ -102,33 +113,7 @@ public class S3UploadActivity extends AppCompatActivity {
             public void run() {
 
             }
-        }, 1000);
-
-/*
-        TransferObserver observer = transferUtility.upload(
-                "s0woo",     // 업로드 할 버킷 이름
-                OBJECT_KEY,    // 버킷에 저장할 파일의 이름 String
-                MY_FILE        // 버킷에 저장할 파일 File
-        );
-
-        observer.setTransferListener(new TransferListener() {
-            @Override
-            public void onStateChanged(int id, TransferState state) {
-
-            }
-
-            @Override
-            public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
-
-            }
-
-            @Override
-            public void onError(int id, Exception ex) {
-                ex.printStackTrace();
-            }
-        });
-*/
-
+        }, 1500);
 
         //업로드 성공하면 다음 동작 수행해야함
         requestMe();
@@ -223,19 +208,19 @@ public class S3UploadActivity extends AppCompatActivity {
             return result;
         }
 
-/*
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            // doInBackground()로 부터 리턴된 값이 onPostExecute()의 매개변수로 넘어오므로 s를 출력한다.
-            // jsp 처리 결과 메시지를 가져옴 contains를 통해 이벤트 처리
-            //testView.setText(s);
-            if (s.contains("성공")) {
-                Toast.makeText(getApplicationContext(), "등록성공", Toast.LENGTH_LONG).show();
-                //finish();
-            }
-        }
-        */
+//
+//        @Override
+//        protected void onPostExecute(String s) {
+//            super.onPostExecute(s);
+//            // doInBackground()로 부터 리턴된 값이 onPostExecute()의 매개변수로 넘어오므로 s를 출력한다.
+//            // jsp 처리 결과 메시지를 가져옴 contains를 통해 이벤트 처리
+//            //testView.setText(s);
+//            if (s.contains("success")) {
+//                Toast.makeText(getApplicationContext(), "등록성공", Toast.LENGTH_LONG).show();
+//
+//                //finish();
+//            }
+//        }
     }
 
 
@@ -245,10 +230,13 @@ public class S3UploadActivity extends AppCompatActivity {
             StringBuffer sbParams = new StringBuffer();
             String userID = SenderEmail; //수정할것
 
+            System.out.println("###############fileName : " + fileName);
+
             //StringBuffer에 파라미터 연결
             // 보낼 데이터가 없으면 파라미터를 비운다.
             if (_params == null) {
                 sbParams.append("userID=" + userID);
+                sbParams.append("&fileName=" + fileName);
             }
 
             try {
@@ -277,6 +265,7 @@ public class S3UploadActivity extends AppCompatActivity {
                 while ((line = reader.readLine()) != null){
                     page += line;
                 }
+                System.out.println("upload 결과 page " + page);
                 return page;
 
             } catch (MalformedURLException e) {
