@@ -30,6 +30,7 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectResult;
+import com.example.home.secretary_kim.VR.VrPanoramaActivity;
 import com.kakao.network.ErrorResult;
 import com.kakao.usermgmt.UserManagement;
 import com.kakao.usermgmt.callback.MeV2ResponseCallback;
@@ -64,7 +65,6 @@ public class S3UploadActivity extends AppCompatActivity {
     SimpleDateFormat mFormat = new SimpleDateFormat("yyyyMMdd hhmmss");
     String fileName;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,8 +75,7 @@ public class S3UploadActivity extends AppCompatActivity {
 
             if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                 System.out.println("Permission is granted");
-                //return true;
-            }else{
+                //return true;            }else{
                 System.out.println("Permission is revoked");
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
 
@@ -91,7 +90,8 @@ public class S3UploadActivity extends AppCompatActivity {
         new Thread() {
             public void run() {
                 //받아온 파노라마로 수정필요
-                Bitmap orgImage = BitmapFactory.decodeFile("/storage/emulated/0/test.jpg");
+                //Bitmap orgImage = BitmapFactory.decodeFile("/storage/emulated/0/test.jpg");
+                Bitmap orgImage = VrPanoramaActivity.img_result;
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 orgImage.compress(Bitmap.CompressFormat.PNG, 100, stream);
 

@@ -19,6 +19,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.home.secretary_kim.R;
+import com.example.home.secretary_kim.S3UploadActivity;
 import com.example.home.secretary_kim.VoiceRecoActivity;
 import com.google.vr.sdk.widgets.pano.VrPanoramaEventListener;
 import com.google.vr.sdk.widgets.pano.VrPanoramaView;
@@ -39,7 +40,7 @@ public class VrPanoramaActivity extends Activity implements SpeechRecognizeListe
     //private ImageActivity imgActivity;
     private Bitmap img_pano;    //그냥 4장 연결만 한거
     private Bitmap img; //좌표판이랑 좌표까지 있는거
-    private Bitmap img_result;   //사각형 그려진거
+    public static Bitmap img_result;   //사각형 그려진거
     private Bitmap[] imgArray;
     public boolean loadImageSuccessful;
 
@@ -177,7 +178,7 @@ public class VrPanoramaActivity extends Activity implements SpeechRecognizeListe
 //        builder.show();
 //    }
 
-    //수정이 필요하다
+    //수정이 필요하다 -> 완료
     public String[] detachString(String result) {
         String[] tmp = new String[3];;
         if(result.length()>=6) {    //xxx-yyy / xxx 갖다줘
@@ -247,11 +248,13 @@ public class VrPanoramaActivity extends Activity implements SpeechRecognizeListe
                 else if(tmp[0] == "take"){  //갖다줘 -> 사각형 한 개
                     panoramaView.loadImageFromBitmap(panoramaImg_result(tmp[1], tmp[2], 1), panoOptions);
                 }
-                else if(tmp[0] == "send"){
+                else if(tmp[0] == "send"){  //사진 전송
                     Toast.makeText(getApplicationContext(), "전송할거", Toast.LENGTH_SHORT).show();
-                    //img_result 이미지 전송
+
+                    //인텐트..?
+                    Intent i = new Intent(getApplicationContext(), S3UploadActivity.class);
+                    startActivityForResult(i, 0);
                 }
-                //makeAlertDialog(builder.toString());
             }
         });
     }
