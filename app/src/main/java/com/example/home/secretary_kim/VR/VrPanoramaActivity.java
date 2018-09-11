@@ -107,9 +107,9 @@ public class VrPanoramaActivity extends Activity implements SpeechRecognizeListe
         }
     }
 
-    public Bitmap panoramaImg_result(String r1, String r2){
+    public Bitmap panoramaImg_result(String r1, String r2, int cnt){
         ImageActivity imageActivity = new ImageActivity(img_pano);
-        img_result = imageActivity.panoramaImg_result(r1, r2);
+        img_result = imageActivity.panoramaImg_result(r1, r2, cnt);
         return img_result;
     }
 
@@ -179,17 +179,34 @@ public class VrPanoramaActivity extends Activity implements SpeechRecognizeListe
 
     //수정이 필요하다
     public String[] detachString(String result) {
-        String[] tmp = new String[2];
-        if(result.length()>=7) {
+        String[] tmp = new String[3];;
+        if(result.length()>=6) {    //xxx-yyy / xxx 갖다줘
             String from = result.substring(0,3);
             String to = result.substring(((result.length())-3), result.length());
-            //System.out.println("*************************************시작: "+ from + "도착" + to);
-            Toast.makeText(getApplicationContext(),"시작: "+ from + " 도착: " + to, Toast.LENGTH_LONG).show();
-            Log.d(TAG, "시작, 도착 : " + from + ", " + to);
-            tmp[0] = from;
-            tmp[1] = to;
-            Log.d(TAG, "TMP : " + tmp[0] + ", " + tmp[1]);
+            if(to != "갖다줘"){    //옮겨줘
+                //System.out.println("*************************************시작: "+ from + "도착" + to);
+                Toast.makeText(getApplicationContext(),"시작: "+ from + " 도착: " + to, Toast.LENGTH_LONG).show();
+                Log.d(TAG, "시작, 도착 : " + from + ", " + to);
+                tmp[0] = "move";
+                tmp[1] = from;
+                tmp[2] = to;
+            }
+            else if(to == "갖다줘"){   //갖다줘
+                tmp[0] = "take";
+                tmp[1] = from;
+            }
         }
+        else if(result.length()==3){    //xxx -> 무조건 갖다줘
+            tmp[0] = "take";
+            tmp[1] = result;
+            tmp[2] = "";
+        }
+        else if(result == "전송"){
+            tmp[0] = "send";
+            tmp[1] = result;
+            tmp[2] = "";
+        }
+        Log.d(TAG, "TMP : " + tmp[0] + " " + tmp[1] + ", " + tmp[2]);
         return tmp;
     }
 
@@ -224,7 +241,16 @@ public class VrPanoramaActivity extends Activity implements SpeechRecognizeListe
                 resultString = builder.toString();
                 Log.d(TAG, "VOICE : " + resultString); //xxx-xxx
                 String[] tmp = detachString(resultString);
-                panoramaView.loadImageFromBitmap(panoramaImg_result(tmp[0], tmp[1]), panoOptions);
+                if(tmp[0] == "move"){   //옮겨줘 -> 사각형 두 개
+                    panoramaView.loadImageFromBitmap(panoramaImg_result(tmp[1], tmp[2], 2), panoOptions);
+                }
+                else if(tmp[0] == "take"){  //갖다줘 -> 사각형 한 개
+                    panoramaView.loadImageFromBitmap(panoramaImg_result(tmp[1], tmp[2], 1), panoOptions);
+                }
+                else if(tmp[0] == "send"){
+                    Toast.makeText(getApplicationContext(), "전송할거", Toast.LENGTH_SHORT).show();
+                    //img_result 이미지 전송
+                }
                 //makeAlertDialog(builder.toString());
             }
         });

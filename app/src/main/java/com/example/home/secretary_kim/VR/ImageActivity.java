@@ -46,7 +46,7 @@ public class ImageActivity {
         p1.setColor(Color.YELLOW);
         p1.setStyle(Paint.Style.STROKE);
         Paint p2 = new Paint();
-        p2.setColor(Color.DKGRAY);
+        p2.setColor(Color.YELLOW);
         p2.setTextAlign(Paint.Align.CENTER);
         p2.setTextSize(12);
         //paint 색 변경하기
@@ -97,8 +97,8 @@ public class ImageActivity {
         return tmp;
     }
 
-    public Bitmap panoramaImg_result(String r1, String r2){
-        Bitmap tmp = drawRect(r1, r2);
+    public Bitmap panoramaImg_result(String r1, String r2, int cnt){
+        Bitmap tmp = drawRect(r1, r2, cnt);
         return panoramaImg(tmp, tmp, true);
     }
 
@@ -134,7 +134,7 @@ public class ImageActivity {
     }
 
     //사각형 그리기
-    public Bitmap drawRect(String r1, String r2){
+    public Bitmap drawRect(String r1, String r2, int cnt){
         Bitmap result = null;
         Bitmap bit = Bitmap.createBitmap(img).copy(Bitmap.Config.ARGB_8888, true);
 
@@ -150,17 +150,33 @@ public class ImageActivity {
         float hLength = height / 6f;
         Log.i("ImageActivity", "wLength / hLength : " + wLength + " / " + hLength);
 
-        float[] coorR1 = detachInt(r1, width / 4, height, wLength, hLength);
-        float[] coorR2 = detachInt(r2, width / 4, height, wLength, hLength);
-
-        result = Bitmap.createScaledBitmap(bit, bit.getWidth(), bit.getHeight(), true);
-        Canvas canvas = new Canvas(result);
         Paint p = new Paint();
         p.setStrokeWidth(5);
         p.setStyle(Paint.Style.STROKE);
         p.setColor(Color.RED);
-        canvas.drawRect(coorR1[0], coorR1[1], coorR1[2], coorR1[3], p);
-        canvas.drawRect(coorR2[0], coorR2[1], coorR2[2], coorR2[3], p);
+
+        if(cnt == 2){   //사각형 두 개
+            Paint p2 = new Paint();
+            p2.setStrokeWidth(5);
+            p2.setStyle(Paint.Style.STROKE);
+            p2.setColor(Color.BLUE);
+
+            float[] coorR1 = detachInt(r1, width / 4, height, wLength, hLength);
+            float[] coorR2 = detachInt(r2, width / 4, height, wLength, hLength);
+
+            result = Bitmap.createScaledBitmap(bit, bit.getWidth(), bit.getHeight(), true);
+            Canvas canvas = new Canvas(result);
+
+            canvas.drawRect(coorR1[0], coorR1[1], coorR1[2], coorR1[3], p);
+            canvas.drawRect(coorR2[0], coorR2[1], coorR2[2], coorR2[3], p2);
+        }
+        else if(cnt == 1){  //사각형 한 개
+            float[] coorR = detachInt(r1, width / 4, height, wLength, hLength);
+            result = Bitmap.createScaledBitmap(bit, bit.getWidth(), bit.getHeight(), true);
+            Canvas canvas = new Canvas(result);
+
+            canvas.drawRect(coorR[0], coorR[1], coorR[2], coorR[3], p);
+        }
 
         return result;
     }
