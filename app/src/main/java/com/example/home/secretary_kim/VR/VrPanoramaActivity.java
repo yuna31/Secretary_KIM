@@ -10,7 +10,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
-import com.example.home.secretary_kim.LocationActivity;
 import com.example.home.secretary_kim.R;
 import com.example.home.secretary_kim.S3UploadActivity;
 import com.google.vr.sdk.widgets.pano.VrPanoramaEventListener;
@@ -24,7 +23,6 @@ import java.util.ArrayList;
 
 public class VrPanoramaActivity extends Activity implements SpeechRecognizeListener {
     private static final String TAG = "VRTESTACTIVITY";
-    LocationActivity locationActivity;
 
     private VrPanoramaView panoramaView;
     //private ImageActivity imgActivity;
@@ -40,6 +38,9 @@ public class VrPanoramaActivity extends Activity implements SpeechRecognizeListe
     private String resultString;
     boolean isSpeechPerm = false;
     SpeechRecognizerClient.Builder builder;
+
+    private LocationClass locationClass;
+    public static String place;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,6 +77,7 @@ public class VrPanoramaActivity extends Activity implements SpeechRecognizeListe
         panoramaView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
+                locationClass.initLoc();
                 //Toast.makeText(getApplicationContext(), "토스트", Toast.LENGTH_SHORT).show();
                 if(isSpeechPerm == true){
                     client.setSpeechRecognizeListener(VrPanoramaActivity.this);
@@ -233,6 +235,7 @@ public class VrPanoramaActivity extends Activity implements SpeechRecognizeListe
                     panoramaView.setDisplayMode(2);
                     Toast.makeText(getApplicationContext(), "전송할거", Toast.LENGTH_SHORT).show();
 
+                    place = locationClass.getLoc();
                     Intent i = new Intent(getApplicationContext(), S3UploadActivity.class);
                     startActivityForResult(i, 0);
                 }

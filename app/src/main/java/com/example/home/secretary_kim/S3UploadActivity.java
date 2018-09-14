@@ -32,6 +32,7 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectResult;
 import com.example.home.secretary_kim.LOGIN.LoginActivity;
 import com.example.home.secretary_kim.VR.VrPanoramaActivity;
+import com.google.common.logging.nano.Vr;
 import com.kakao.network.ErrorResult;
 import com.kakao.usermgmt.UserManagement;
 import com.kakao.usermgmt.callback.MeV2ResponseCallback;
@@ -235,7 +236,7 @@ public class S3UploadActivity extends AppCompatActivity {
             StringBuffer sbParams = new StringBuffer();
             String userName = SenderName;
             String userID = SenderEmail; //수정할것
-            String place ="";
+            String place = VrPanoramaActivity.place;
 
             System.out.println("###############fileName : " + fileName);
 
