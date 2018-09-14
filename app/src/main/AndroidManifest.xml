@@ -12,8 +12,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
     <application
         android:name=".LOGIN.GlobalApplication"
@@ -28,10 +27,6 @@
             android:name="com.kakao.sdk.AppKey"
             android:value="@string/kakao_app_key" />
 
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key"/>
-
         <activity android:name=".LOGIN.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -39,29 +34,39 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".MainActivity_NOLAYOUT"></activity>
-        <activity android:name=".LOGIN.KakaoSignupActivity"/>
-
         <activity android:name=".VR.DeviceListActivity"
             android:theme="@android:style/Theme.DeviceDefault.Dialog">
         </activity>
 
+        <activity android:name=".LOGIN.KakaoSignupActivity"></activity>
+
         <activity android:name=".VR.VrPanoramaActivity"></activity>
+
         <activity android:name=".VR.BluetoothActivity"></activity>
 
-        <activity android:name=".VoiceRecoActivity" />
+        <activity android:name=".SplashActivity"> </activity>
 
+        <activity android:name=".MainActivity" />
+        
+        <activity android:name=".SpeechActivity" />
+
+        <activity android:name=".VoiceRecoActivity" />
+        
         <activity android:name=".MakeConnActivity">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
             </intent-filter>
         </activity>
 
-        <activity android:name=".S3UploadActivity" />
+        <activity android:name=".S3UploadActivity"
+            android:theme="@style/Transparent">
+        </activity>
 
         <activity android:name=".S3DownloadActivity" />
 
-        <service
+        <activity android:name=".MakeUserListActivity" />
+
+         <service
             android:name=".MyFirebaseInstanceIDService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
@@ -73,6 +78,9 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
+        <meta-data android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key"/>
 
     </application>
 
