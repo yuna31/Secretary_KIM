@@ -165,7 +165,8 @@ public class BluetoothActivity extends AppCompatActivity {
         sos_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //긴급호출 팝업
+                Intent i = new Intent(getApplicationContext(), EmergencyActivity.class);
+                startActivityForResult(i, 0);
             }
         });
     }
