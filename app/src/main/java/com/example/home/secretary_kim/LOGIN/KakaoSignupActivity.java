@@ -63,7 +63,7 @@ public class KakaoSignupActivity extends Activity {
     }
     private void redirectMainActivity(String url, String nickname) {
         //Intent intent = new Intent(KakaoSignupActivity.this, MainActivity_NOLAYOUT.class);
-        Intent intent = new Intent(KakaoSignupActivity.this, BluetoothActivity.class);
+        Intent intent = new Intent(KakaoSignupActivity.this, SelectRoleActivity.class);
         intent.putExtra("url", url);
         intent.putExtra("nickname", nickname);
         startActivity(intent);
