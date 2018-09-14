@@ -6,6 +6,7 @@ package com.example.home.secretary_kim;
 
 import android.content.ContentValues;
 import android.content.Context;
+
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -17,7 +18,7 @@ public class DBUserORSecretary extends SQLiteOpenHelper {
 
     public void onCreate(SQLiteDatabase db) {
         String sql = "create table if not exists SelectRole("
-                + "id integer, "
+                + "num integer, "
                 + "role text);";
         db.execSQL(sql);
     }
@@ -29,20 +30,29 @@ public class DBUserORSecretary extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public void update(int id, String role) {
+    public void insert(int num, String role) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
-        //values.put("id", id);
+        values.put("num", num);
         values.put("role", role);
-        db.update("SelectRole", values, "id="+id, null);
+        db.insert("SelectRole", null, values);
+        db.close();
+    }
+
+    public void update(int num, String role) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("num", num);
+        values.put("role", role);
+        db.update("SelectRole", values, "num="+num, null);
 
         db.close();
     }
 
     /*
-    public void delete(int id) {
+    public void delete(int num) {
         SQLiteDatabase db = getWritableDatabase();
-        db.delete("SelectRole",  "id="+id, null);
+        db.delete("SelectRole",  "num="+num, null);
         db.close();
     }
     */
@@ -55,12 +65,9 @@ public class DBUserORSecretary extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery("SELECT * FROM SelectRole", null);
 
         while (cursor.moveToNext()) {
-            result += "역할 : "
-                    + cursor.getString(0)
-                    + "\n";
+            result = cursor.getString(1);
         }
 
         return result;
     }
-
 }
