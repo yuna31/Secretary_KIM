@@ -7,18 +7,29 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.renderscript.ScriptGroup;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.http.HttpResponse;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.GetObjectMetadataRequest;
+import com.amazonaws.services.s3.model.GetObjectRequest;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.util.IOUtils;
 import com.example.home.secretary_kim.LOGIN.LoginActivity;
@@ -28,17 +39,24 @@ import com.kakao.usermgmt.callback.MeV2ResponseCallback;
 import com.kakao.usermgmt.response.MeV2Response;
 import com.kakao.util.helper.log.Logger;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.net.HttpRetryException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,14 +70,12 @@ public class S3DownloadActivity extends AppCompatActivity {
     Bitmap bmp;
     String fileName = "";
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_s3download);
 
         ImageView imageView = (ImageView) findViewById(R.id.bitmapView);
-        Button newfileButton = (Button) findViewById(R.id.newfilebutton);
         Button oldfileButton = (Button) findViewById(R.id.oldfilebutton);
 
         requestMe();
@@ -74,7 +90,7 @@ public class S3DownloadActivity extends AppCompatActivity {
                         NetworkTask networkTask = new NetworkTask(url, null);
                         networkTask.execute();
                     }
-                }, 3000);
+                }, 1500);
             }
         }.start();
 
@@ -122,7 +138,7 @@ public class S3DownloadActivity extends AppCompatActivity {
                     }
                 }.start();
             }
-        },7000);
+        },4000);
     }
 
     public class NetworkTask extends AsyncTask<Void, Void, String> {
@@ -160,13 +176,15 @@ public class S3DownloadActivity extends AppCompatActivity {
         public String request(String _url, ContentValues _params) {
             HttpURLConnection urlConn = null;
             StringBuffer sbParams = new StringBuffer();
+            String userID = getIntent().getStringExtra("UserMail");
             String secretaryID = ReceiverEmail; //수정할것
-            System.out.println("request : " + secretaryID);
+            System.out.println("request user : " + userID + " " +  secretaryID);
 
             //StringBuffer에 파라미터 연결
             // 보낼 데이터가 없으면 파라미터를 비운다.
             if (_params == null) {
                 sbParams.append("secretaryID=" + secretaryID);
+                sbParams.append("&userID=" + userID);
             }
 
             try {
