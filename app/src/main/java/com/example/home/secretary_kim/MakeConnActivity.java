@@ -1,8 +1,10 @@
 package com.example.home.secretary_kim;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -10,8 +12,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.home.secretary_kim.LOGIN.LoginActivity;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
+import com.kakao.network.ErrorResult;
+import com.kakao.network.NetworkTask;
+import com.kakao.usermgmt.UserManagement;
+import com.kakao.usermgmt.callback.MeV2ResponseCallback;
+import com.kakao.usermgmt.response.MeV2Response;
+import com.kakao.util.helper.log.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,6 +31,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by s0woo 2018-08-14.
@@ -34,7 +45,7 @@ public class MakeConnActivity extends AppCompatActivity  {
 
     public EditText ed_userId, ed_secretaryID;
     public Button saveBtn;
-    String userID, secretaryID, secretaryUUID;
+    String userID, secretaryID, secretaryUUID, ReceiverEmail;
 
     Connection conn = null;
     Statement stmt = null;
@@ -44,25 +55,38 @@ public class MakeConnActivity extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_makeconn);
 
-        ed_userId = (EditText)findViewById(R.id.userID);
-        ed_secretaryID = (EditText)findViewById(R.id.secretaryID);
-        saveBtn = (Button)findViewById(R.id.save_button);
 
-        saveBtn.setOnClickListener(new View.OnClickListener() {
+        requestMe();
+
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
             @Override
-            public void onClick(View view) {
-                MyFirebaseInstanceIDService firebaseInstanceIDService = new MyFirebaseInstanceIDService();
+            public void run() {
+                ed_userId = (EditText)findViewById(R.id.userID);
+                ed_secretaryID = (EditText)findViewById(R.id.secretaryID);
+                System.out.println("settext : " + ReceiverEmail);
+                ed_secretaryID.setText(ReceiverEmail);
+                saveBtn = (Button)findViewById(R.id.save_button);
 
-                userID = ed_userId.getText().toString();
-                secretaryID = ed_secretaryID.getText().toString();
-                secretaryUUID = firebaseInstanceIDService.getToken(); //UUID 받아오는 코드로 수정해야함
+                saveBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        MyFirebaseInstanceIDService firebaseInstanceIDService = new MyFirebaseInstanceIDService();
 
-                String url = "http://13.209.64.57:8080/dbSave.jsp";
+                        userID = ed_userId.getText().toString();
+                        secretaryID = ReceiverEmail;
+                        secretaryUUID = firebaseInstanceIDService.getToken(); //UUID 받아오는 코드로 수정해야함
 
-                NetworkTask networkTask = new NetworkTask(url, null);
-                networkTask.execute();
+                        String url = "http://13.209.64.57:8080/dbSave.jsp";
+
+                        NetworkTask networkTask = new NetworkTask(url, null);
+                        networkTask.execute();
+                    }
+                });
             }
-        });
+        },500);
+
+
     }
 
 
@@ -87,9 +111,9 @@ public class MakeConnActivity extends AppCompatActivity  {
             // doInBackground()로 부터 리턴된 값이 onPostExecute()의 매개변수로 넘어오므로 s를 출력한다.
             // jsp 처리 결과 메시지를 가져옴 contains를 통해 이벤트 처리
             //testView.setText(s);
-            if (s.contains("성공")) {
+            if (s.contains("success")) {
                 Toast.makeText(getApplicationContext(), "성공", Toast.LENGTH_SHORT).show();
-                //finish();
+                finish();
             }
         }
     }
@@ -167,5 +191,34 @@ public class MakeConnActivity extends AppCompatActivity  {
             System.out.println("###########token : " + token);
             return token;
         }
+    }
+
+    private void requestMe() {
+        List<String> keys = new ArrayList<>();
+        keys.add("kakao_account.email");
+
+        UserManagement.getInstance().me(keys, new MeV2ResponseCallback() {
+            @Override
+            public void onFailure(ErrorResult errorResult) {
+                String message = "failed to get user info. msg=" + errorResult;
+                Logger.d(message);
+            }
+
+            @Override
+            public void onSessionClosed(ErrorResult errorResult) {
+                Intent i = new Intent(getApplicationContext(), LoginActivity.class);
+                startActivityForResult(i, 0);
+                Toast.makeText(getApplicationContext(), "다시 로그인해주세요", Toast.LENGTH_LONG).show();
+                System.out.println("****** " + errorResult.getErrorMessage());
+            }
+
+            @Override
+            public void onSuccess(MeV2Response response) {
+                Logger.d("email: " + response.getKakaoAccount().getEmail());
+                ReceiverEmail = response.getKakaoAccount().getEmail();
+                Toast.makeText(getApplicationContext(), "kakao email : " + response.getKakaoAccount().getEmail(), Toast.LENGTH_SHORT).show();
+                System.out.println("@@@@@@@@@@Email : " + ReceiverEmail);
+            }
+        });
     }
 }
