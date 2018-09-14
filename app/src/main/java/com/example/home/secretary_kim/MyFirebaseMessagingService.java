@@ -2,14 +2,17 @@ package com.example.home.secretary_kim;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 
-import com.example.home.secretary_kim.VR.BluetoothActivity;
 import com.google.firebase.messaging.RemoteMessage;
+
+import static java.lang.Integer.parseInt;
 
 
 public class MyFirebaseMessagingService extends com.google.firebase.messaging.FirebaseMessagingService {
@@ -19,12 +22,29 @@ public class MyFirebaseMessagingService extends com.google.firebase.messaging.Fi
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
 
-        //추가한것
-        sendNotification(remoteMessage.getData().get("message"));
+        //****설정 알림 on/off로 옮기기
+        DBnotification NotiOnOff = new DBnotification(MyFirebaseMessagingService.this, "NotiOnOff.db", null, 1);
+        SQLiteDatabase dbNoti;
+
+        dbNoti = NotiOnOff.getWritableDatabase();
+        NotiOnOff.onCreate(dbNoti);
+        ContentValues values = new ContentValues();
+        //values.put("id", 1);
+        values.put("OnOff", "ON");
+        //values.put("OnOff", "OFF");
+        //dbNoti.insert("NotiOnOff", null,values);
+        dbNoti.update("NotiOnOff", values, "1", null);
+        //dbNoti.delete("NotiOnOff", "1", null);
+        String notification = NotiOnOff.getResult();
+        System.out.println("noti On/Off : " + notification);
+
+        if(notification.equals("ON")) {
+            sendNotification(remoteMessage.getData().get("message"));
+        }
     }
 
     private void sendNotification(String messageBody) {
-        Intent intent = new Intent(this, BluetoothActivity.class);
+        Intent intent = new Intent(this, S3DownloadActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);
