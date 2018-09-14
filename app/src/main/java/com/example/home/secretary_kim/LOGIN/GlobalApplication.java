@@ -1,4 +1,4 @@
-package com.example.home.secretary_kim;
+package com.example.home.secretary_kim.LOGIN;
 
 import android.app.Activity;
 import android.app.Application;

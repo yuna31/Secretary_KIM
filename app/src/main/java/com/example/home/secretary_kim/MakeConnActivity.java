@@ -12,7 +12,6 @@ import android.widget.Toast;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
-import com.kakao.network.NetworkTask;
 
 import java.io.BufferedReader;
 import java.io.IOException;

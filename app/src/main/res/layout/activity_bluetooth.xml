@@ -16,12 +16,12 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/cam_btn"
-        android:text="사진찍기" />
+        android:id="@+id/request_btn"
+        android:text="이동요청" />
 
     <Button
-        android:id="@+id/speech_btn"
+        android:id="@+id/sos_btn"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:text="음성+DB"/>
+        android:text="긴급호출" />
 </LinearLayout>

@@ -12,9 +12,11 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
-        android:name=".GlobalApplication"
+        android:name=".LOGIN.GlobalApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -26,28 +28,29 @@
             android:name="com.kakao.sdk.AppKey"
             android:value="@string/kakao_app_key" />
 
-        <activity android:name=".MainActivity">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key"/>
+
+        <activity android:name=".LOGIN.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <activity android:name=".LoginActivity">
+        <activity android:name=".MainActivity_NOLAYOUT"></activity>
+        <activity android:name=".LOGIN.KakaoSignupActivity"/>
 
-        </activity>
-        
         <activity android:name=".VR.DeviceListActivity"
             android:theme="@android:style/Theme.DeviceDefault.Dialog">
         </activity>
 
         <activity android:name=".VR.VrPanoramaActivity"></activity>
         <activity android:name=".VR.BluetoothActivity"></activity>
-        
-        <activity android:name=".SpeechActivity" />
 
         <activity android:name=".VoiceRecoActivity" />
-        
+
         <activity android:name=".MakeConnActivity">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
@@ -58,7 +61,7 @@
 
         <activity android:name=".S3DownloadActivity" />
 
-         <service
+        <service
             android:name=".MyFirebaseInstanceIDService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>

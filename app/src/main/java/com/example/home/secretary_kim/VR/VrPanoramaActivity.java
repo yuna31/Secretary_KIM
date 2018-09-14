@@ -1,40 +1,30 @@
 package com.example.home.secretary_kim.VR;
 
-import android.Manifest;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.home.secretary_kim.LocationActivity;
 import com.example.home.secretary_kim.R;
 import com.example.home.secretary_kim.S3UploadActivity;
-import com.example.home.secretary_kim.VoiceRecoActivity;
 import com.google.vr.sdk.widgets.pano.VrPanoramaEventListener;
 import com.google.vr.sdk.widgets.pano.VrPanoramaView;
 import com.kakao.sdk.newtoneapi.SpeechRecognizeListener;
-import com.kakao.sdk.newtoneapi.SpeechRecognizerActivity;
 import com.kakao.sdk.newtoneapi.SpeechRecognizerClient;
 import com.kakao.sdk.newtoneapi.SpeechRecognizerManager;
 import com.kakao.sdk.newtoneapi.impl.util.PermissionUtils;
 
 import java.util.ArrayList;
 
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
-
 public class VrPanoramaActivity extends Activity implements SpeechRecognizeListener {
     private static final String TAG = "VRTESTACTIVITY";
+    LocationActivity locationActivity;
 
     private VrPanoramaView panoramaView;
     //private ImageActivity imgActivity;
@@ -48,6 +38,8 @@ public class VrPanoramaActivity extends Activity implements SpeechRecognizeListe
 
     private SpeechRecognizerClient client;
     private String resultString;
+    boolean isSpeechPerm = false;
+    SpeechRecognizerClient.Builder builder;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,9 +66,8 @@ public class VrPanoramaActivity extends Activity implements SpeechRecognizeListe
         panoramaView.setDisplayMode(3);
 
         if(PermissionUtils.checkAudioRecordPermission(VrPanoramaActivity.this)) {
-
-            SpeechRecognizerClient.Builder builder = new SpeechRecognizerClient.Builder().
-                    setServiceType(serviceType);
+            isSpeechPerm = true;
+            builder = new SpeechRecognizerClient.Builder().setServiceType(serviceType);
 
             client = builder.build();
         }
@@ -86,10 +77,15 @@ public class VrPanoramaActivity extends Activity implements SpeechRecognizeListe
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 //Toast.makeText(getApplicationContext(), "토스트", Toast.LENGTH_SHORT).show();
-
-                //음성 인식
-                client.setSpeechRecognizeListener(VrPanoramaActivity.this);
-                client.startRecording(true);
+                if(isSpeechPerm == true){
+                    client.setSpeechRecognizeListener(VrPanoramaActivity.this);
+                    client.startRecording(true);
+                }
+                else{
+                    client = builder.build();
+                    isSpeechPerm = true;
+                    Log.d(TAG, "isSpeechPerm false");
+                }
 
                 return true;
             }
@@ -151,63 +147,46 @@ public class VrPanoramaActivity extends Activity implements SpeechRecognizeListe
 
     }
 
-//    public void makeAlertDialog(final String result) {
-//        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setTitle("음성인식 결과");
-//        builder.setMessage(result);
-//
-//        builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialogInterface, int i) {
-//                dialogInterface.dismiss();
-//                detachString(result);
-//            }
-//        });
-//
-//        builder.setNegativeButton("다시하기", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialogInterface, int i) {
-//                dialogInterface.dismiss();
-//                String serviceType = SpeechRecognizerClient.SERVICE_TYPE_WEB;
-//                Intent intent = new Intent(getApplicationContext(), VoiceRecoActivity.class);
-//                intent.putExtra(SpeechRecognizerActivity.EXTRA_KEY_SERVICE_TYPE, serviceType);
-//                startActivityForResult(intent, 0);
-//            }
-//        });
-//
-//        builder.show();
-//    }
-
     //수정이 필요하다 -> 완료
     public String[] detachString(String result) {
+        Log.d("SPEECHTEST", "RESULT, length : " + result + ", " + result.length());
         String[] tmp = new String[3];;
         if(result.length()>=6) {    //xxx-yyy / xxx 갖다줘
             String from = result.substring(0,3);
             String to = result.substring(((result.length())-3), result.length());
-            if(to != "갖다줘"){    //옮겨줘
-                //System.out.println("*************************************시작: "+ from + "도착" + to);
-                Toast.makeText(getApplicationContext(),"시작: "+ from + " 도착: " + to, Toast.LENGTH_LONG).show();
-                Log.d(TAG, "시작, 도착 : " + from + ", " + to);
-                tmp[0] = "move";
-                tmp[1] = from;
-                tmp[2] = to;
-            }
-            else if(to == "갖다줘"){   //갖다줘
+            //System.out.println("*************************************시작: "+ from + "도착" + to);
+            Toast.makeText(getApplicationContext(),"시작: "+ from + " 도착: " + to, Toast.LENGTH_LONG).show();
+            Log.d(TAG, "시작, 도착 : " + from + ", " + to);
+            tmp[0] = "move";
+            tmp[1] = from;
+            tmp[2] = to;
+        }
+        else if(result.length()>=3) {//xxx -> 무조건 갖다줘
+            if(!result.equals("갖다줘") && !result.equals("옮겨줘")){
                 tmp[0] = "take";
-                tmp[1] = from;
+                tmp[1] = result;
+                tmp[2] = "-1";
+            }
+            if(result.equals("갖다 줘") || result.equals("갖다줘") || result.equals("옮겨줘")){
+                tmp[0] = "send";
+                tmp[1] = result;
+                tmp[2] = "-1";
+            }
+
+        }
+        else if(result.length()==2){
+            if(result.equals("전송")){
+                tmp[0] = "send";
+                tmp[1] = result;
+                tmp[2] = "-1";
             }
         }
-        else if(result.length()==3){    //xxx -> 무조건 갖다줘
-            tmp[0] = "take";
-            tmp[1] = result;
-            tmp[2] = "";
+        else{
+            tmp[0] = "etc";
+            tmp[1] = "-1";
+            tmp[2] = "-1";
         }
-        else if(result == "전송"){
-            tmp[0] = "send";
-            tmp[1] = result;
-            tmp[2] = "";
-        }
-        Log.d(TAG, "TMP : " + tmp[0] + " " + tmp[1] + ", " + tmp[2]);
+        Log.d(TAG, "TMP : " + tmp[0] + ", " + tmp[1] + ", " + tmp[2]);
         return tmp;
     }
 
@@ -215,6 +194,7 @@ public class VrPanoramaActivity extends Activity implements SpeechRecognizeListe
     public void onError(int errorCode, String errorMsg) {
         Log.e("SpeechSampleActivity", "onError : " + errorMsg);
 
+        isSpeechPerm =false;
         client = null;
     }
 
@@ -249,11 +229,15 @@ public class VrPanoramaActivity extends Activity implements SpeechRecognizeListe
                     panoramaView.loadImageFromBitmap(panoramaImg_result(tmp[1], tmp[2], 1), panoOptions);
                 }
                 else if(tmp[0] == "send"){  //사진 전송
+                    Log.d(TAG, "전송");
+                    panoramaView.setDisplayMode(2);
                     Toast.makeText(getApplicationContext(), "전송할거", Toast.LENGTH_SHORT).show();
 
-                    //인텐트..?
                     Intent i = new Intent(getApplicationContext(), S3UploadActivity.class);
                     startActivityForResult(i, 0);
+                }
+                else{
+                    Log.d(TAG, "잘못된 음성");
                 }
             }
         });

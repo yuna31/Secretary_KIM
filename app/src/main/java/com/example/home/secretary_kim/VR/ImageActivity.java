@@ -171,11 +171,15 @@ public class ImageActivity {
             canvas.drawRect(coorR2[0], coorR2[1], coorR2[2], coorR2[3], p2);
         }
         else if(cnt == 1){  //사각형 한 개
+            Paint p2 = new Paint();
+            p2.setStrokeWidth(5);
+            p2.setStyle(Paint.Style.STROKE);
+            p2.setColor(Color.GREEN);
             float[] coorR = detachInt(r1, width / 4, height, wLength, hLength);
             result = Bitmap.createScaledBitmap(bit, bit.getWidth(), bit.getHeight(), true);
             Canvas canvas = new Canvas(result);
 
-            canvas.drawRect(coorR[0], coorR[1], coorR[2], coorR[3], p);
+            canvas.drawRect(coorR[0], coorR[1], coorR[2], coorR[3], p2);
         }
 
         return result;
@@ -183,21 +187,24 @@ public class ImageActivity {
 
     //사각형 좌표 찾기
     public float[] detachInt(String str, float width, float height, float wLength, float hLength){
-        int[] strint = new int[3];
-        float[] result = new float[4];
-        int tmp = Integer.parseInt(str);
-        Log.d(TAG, "detachInt : " + tmp);
+        if(str != "-1"){
+            int[] strint = new int[3];
+            float[] result = new float[4];
+            int tmp = Integer.parseInt(str);
+            Log.d(TAG, "detachInt : " + tmp);
 
-        strint[0] = tmp / 100;  //100 자리 -> 사진 번호
-        strint[1] = (tmp - (strint[0]*100)) / 10; //10 자리 -> 가로 줄 번호
-        strint[2] = tmp - (strint[0]*100) - (strint[1]*10);    //1 자리 -> 세로 줄 번호
+            strint[0] = tmp / 100;  //100 자리 -> 사진 번호
+            strint[1] = (tmp - (strint[0]*100)) / 10; //10 자리 -> 가로 줄 번호
+            strint[2] = tmp - (strint[0]*100) - (strint[1]*10);    //1 자리 -> 세로 줄 번호
 
-        result[0] = ((strint[0]-1)*width)+((strint[2]-1)*wLength);
-        result[1] = strint[1] * hLength;
-        result[2] = result[0] + wLength;
-        result[3] = result[1] + hLength;
-        Log.d(TAG, "result : " + result[0] + ", " + result[1] + ", " + result[2] + ", " + result[3]);
+            result[0] = ((strint[0]-1)*width)+((strint[2]-1)*wLength);
+            result[1] = strint[1] * hLength;
+            result[2] = result[0] + wLength;
+            result[3] = result[1] + hLength;
+            Log.d(TAG, "result : " + result[0] + ", " + result[1] + ", " + result[2] + ", " + result[3]);
 
-        return result;
+            return result;
+        }
+        return null;
     }
 }

@@ -13,15 +13,11 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
-import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
-import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
-import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
@@ -30,6 +26,7 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectResult;
+import com.example.home.secretary_kim.LOGIN.LoginActivity;
 import com.example.home.secretary_kim.VR.VrPanoramaActivity;
 import com.kakao.network.ErrorResult;
 import com.kakao.usermgmt.UserManagement;
@@ -90,8 +87,14 @@ public class S3UploadActivity extends AppCompatActivity {
         new Thread() {
             public void run() {
                 //받아온 파노라마로 수정필요
-                //Bitmap orgImage = BitmapFactory.decodeFile("/storage/emulated/0/test.jpg");
-                Bitmap orgImage = VrPanoramaActivity.img_result;
+                Bitmap orgImage;
+                if(VrPanoramaActivity.img_result != null){
+                    orgImage = VrPanoramaActivity.img_result;
+                }
+                else{
+                    orgImage = BitmapFactory.decodeFile("/storage/emulated/0/test.jpg");
+                }
+
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 orgImage.compress(Bitmap.CompressFormat.PNG, 100, stream);
 

@@ -9,4 +9,6 @@
     <string name="title_other_devices">Other Available Devices</string>
     <string name="button_scan">Scan for devices</string>
 
+    <!-- GoogleMapService -->
+    <string name="google_maps_key">AIzaSyDsnkDV1m_rOxepb30GhSwk-MHOHYbz49g</string>
 </resources>

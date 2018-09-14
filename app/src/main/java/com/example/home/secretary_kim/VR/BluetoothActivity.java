@@ -15,11 +15,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.home.secretary_kim.R;
-import com.example.home.secretary_kim.SpeechActivity;
 
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
@@ -47,8 +45,8 @@ public class BluetoothActivity extends AppCompatActivity {
 
     private static final int CNT_4 = 4;
     private Button bluetooth_btn;
-    private Button cam_btn;
-    private Button speech_btn;
+    private Button request_btn;
+    private Button sos_btn;
 
     private BluetoothService bluetoothService = null;
     private StringBuffer mOutStringBuffer;
@@ -110,6 +108,8 @@ public class BluetoothActivity extends AppCompatActivity {
         Log.d(TAG, "onCreate");
         setContentView(R.layout.activity_bluetooth);
 
+        checkPerm();
+
         if(bluetoothService == null){
             bluetoothService = new BluetoothService(this, mHandler);
             mOutStringBuffer = new StringBuffer("");
@@ -141,8 +141,8 @@ public class BluetoothActivity extends AppCompatActivity {
         prBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         prBar.setMessage("이미지 로딩중입니다");
 
-        cam_btn = (Button)findViewById(R.id.cam_btn);
-        cam_btn.setOnClickListener(new Button.OnClickListener(){
+        request_btn = (Button)findViewById(R.id.request_btn);
+        request_btn.setOnClickListener(new Button.OnClickListener(){
 
             @Override
             public void onClick(View view) {
@@ -161,14 +161,11 @@ public class BluetoothActivity extends AppCompatActivity {
             }
         });
 
-        speech_btn = (Button)findViewById(R.id.speech_btn);
-        speech_btn.setOnClickListener(new View.OnClickListener(){
-
+        sos_btn = (Button) findViewById(R.id.sos_btn);
+        sos_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(
-                        getApplicationContext(), SpeechActivity.class);
-                startActivity(intent);
+                //긴급호출 팝업
             }
         });
     }
@@ -230,7 +227,7 @@ public class BluetoothActivity extends AppCompatActivity {
             imgArray[cnt] = bmp;
             cnt++;
             if(cnt==4){
-                checkPerm();
+                //checkPerm();
 
                 prHandler.sendEmptyMessage(CNT_4);
                 arrState = NOT_NULL_IMGARRAY;
@@ -247,7 +244,7 @@ public class BluetoothActivity extends AppCompatActivity {
 
     public void checkPerm(){
         //나중에 permission 분리할 수 있다면 하는걸로.. 처음 시작할 때 넣는게 나을 거 같다
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED //음성 퍼미션
                 || ActivityCompat.checkSelfPermission(this, WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.RECORD_AUDIO)
                     && ActivityCompat.shouldShowRequestPermissionRationale(this, WRITE_EXTERNAL_STORAGE)) {
@@ -258,6 +255,8 @@ public class BluetoothActivity extends AppCompatActivity {
         } else {
             //startUsingSpeechSDK();
         }
+
+        //위치 퍼미션
     }
 
     @Override
