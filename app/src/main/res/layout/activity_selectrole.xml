@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RadioGroup android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/radioGroup1">
+
+        <RadioButton android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/radio0" android:text="사용자" android:checked="true"/>
+
+        <RadioButton android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/radio1" android:text="관리자"/>
+
+    </RadioGroup>
+
+    <Button android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/button1" android:text="선택완료"/>
+
+
+</LinearLayout>
