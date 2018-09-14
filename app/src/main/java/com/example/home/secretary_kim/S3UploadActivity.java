@@ -1,9 +1,12 @@
 package com.example.home.secretary_kim;
 
 import android.Manifest;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -13,6 +16,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amazonaws.AmazonClientException;
@@ -49,23 +53,27 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static java.lang.Integer.parseInt;
+
 /**
  * Created by s0woo on 2018-08-20.
  * Edited by s0woo on 2018-09-04.
  */
 
 public class S3UploadActivity extends AppCompatActivity {
-    String SenderEmail;
+    String SenderEmail; String SenderName;
     byte[] bytes;
-    long mNow;
-    Date mDate;
-    SimpleDateFormat mFormat = new SimpleDateFormat("yyyyMMdd hhmmss");
+
+    long mNow; Date mDate;
+    SimpleDateFormat mFormat = new SimpleDateFormat("yyyyMMdd HH시 mm분 ss초");
     String fileName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_s3upload);
+
+        TextView textView = (TextView)findViewById(R.id.textview);
 
         //합치고나면 지워도되는
         if (Build.VERSION.SDK_INT >= 23) {
@@ -87,14 +95,8 @@ public class S3UploadActivity extends AppCompatActivity {
         new Thread() {
             public void run() {
                 //받아온 파노라마로 수정필요
-                Bitmap orgImage;
-                if(VrPanoramaActivity.img_result != null){
-                    orgImage = VrPanoramaActivity.img_result;
-                }
-                else{
-                    orgImage = BitmapFactory.decodeFile("/storage/emulated/0/test.jpg");
-                }
-
+                Bitmap orgImage = BitmapFactory.decodeFile("/storage/emulated/0/test.jpg");
+                //Bitmap orgImage = VrPanoramaActivity.img_result;
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 orgImage.compress(Bitmap.CompressFormat.PNG, 100, stream);
 
@@ -121,15 +123,16 @@ public class S3UploadActivity extends AppCompatActivity {
         //업로드 성공하면 다음 동작 수행해야함
         requestMe();
 
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                String url = "http://13.209.64.57:8080/pushNoti.jsp";
-                NetworkTask networkTask = new NetworkTask(url, null);
-                networkTask.execute();
-            }
-        }, 1000);
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    String url = "http://13.209.64.57:8080/pushNoti.jsp";
+                    NetworkTask networkTask = new NetworkTask(url, null);
+                    networkTask.execute();
+                }
+            }, 1000);
+
     }
 
     @Override
@@ -211,19 +214,18 @@ public class S3UploadActivity extends AppCompatActivity {
             return result;
         }
 
-//
-//        @Override
-//        protected void onPostExecute(String s) {
-//            super.onPostExecute(s);
-//            // doInBackground()로 부터 리턴된 값이 onPostExecute()의 매개변수로 넘어오므로 s를 출력한다.
-//            // jsp 처리 결과 메시지를 가져옴 contains를 통해 이벤트 처리
-//            //testView.setText(s);
-//            if (s.contains("success")) {
-//                Toast.makeText(getApplicationContext(), "등록성공", Toast.LENGTH_LONG).show();
-//
-//                //finish();
-//            }
-//        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            // doInBackground()로 부터 리턴된 값이 onPostExecute()의 매개변수로 넘어오므로 s를 출력한다.
+            // jsp 처리 결과 메시지를 가져옴 contains를 통해 이벤트 처리
+            //testView.setText(s);
+            if (s.contains("success")) {
+                Toast.makeText(getApplicationContext(), "등록성공", Toast.LENGTH_LONG).show();
+                finish();
+            }
+        }
     }
 
 
@@ -231,7 +233,9 @@ public class S3UploadActivity extends AppCompatActivity {
         public String request(String _url, ContentValues _params) {
             HttpURLConnection urlConn = null;
             StringBuffer sbParams = new StringBuffer();
+            String userName = SenderName;
             String userID = SenderEmail; //수정할것
+            String place ="";
 
             System.out.println("###############fileName : " + fileName);
 
@@ -239,7 +243,9 @@ public class S3UploadActivity extends AppCompatActivity {
             // 보낼 데이터가 없으면 파라미터를 비운다.
             if (_params == null) {
                 sbParams.append("userID=" + userID);
+                sbParams.append("&userName=" + userName);
                 sbParams.append("&fileName=" + fileName);
+                sbParams.append("&place=" + place);
             }
 
             try {
@@ -287,6 +293,7 @@ public class S3UploadActivity extends AppCompatActivity {
 
     private void requestMe() {
         List<String> keys = new ArrayList<>();
+        keys.add("properties.nickname");
         keys.add("kakao_account.email");
 
         UserManagement.getInstance().me(keys, new MeV2ResponseCallback() {
@@ -306,12 +313,14 @@ public class S3UploadActivity extends AppCompatActivity {
 
             @Override
             public void onSuccess(MeV2Response response) {
-                Logger.d("email: " + response.getKakaoAccount().getEmail());
+                //Logger.d("email: " + response.getKakaoAccount().getEmail());
+                SenderName = response.getNickname();
                 SenderEmail = response.getKakaoAccount().getEmail();
                 //Toast.makeText(getApplicationContext(), "kakao email : " + response.getKakaoAccount().getEmail(), Toast.LENGTH_LONG).show();
-                //System.out.println("@@@@@@@@@@Email : " + tempEmail);
+                System.out.println("@@@@@전송자 정보 : " + SenderName + " " + SenderEmail);
             }
         });
     }
+
 }
 
