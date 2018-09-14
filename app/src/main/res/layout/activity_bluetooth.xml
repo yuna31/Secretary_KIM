@@ -18,8 +18,4 @@
 
     <Button android:layout_height="wrap_content" android:layout_width="wrap_content" android:text="긴급호출" android:id="@+id/sos_btn"/>
 
-    <Button android:layout_height="wrap_content" android:layout_width="wrap_content" android:text="영우꺼" android:id="@+id/s0woo_btn"/>
-
-    <Button android:layout_height="wrap_content" android:layout_width="wrap_content" android:text="유나꺼" android:id="@+id/yuna_btn"/>
-
 </LinearLayout>
