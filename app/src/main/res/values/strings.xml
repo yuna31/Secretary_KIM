@@ -8,6 +8,11 @@
     <string name="title_paired_devices">Paired Devices</string>
     <string name="title_other_devices">Other Available Devices</string>
     <string name="button_scan">Scan for devices</string>
+    
+    <string name="map">지도</string>
+    <string name="list">목록</string>
+    <string name="setting">설정</string>
+    <string name="title_activity_settings">Settings</string>
 
     <!-- GoogleMapService -->
     <string name="google_maps_key">AIzaSyDsnkDV1m_rOxepb30GhSwk-MHOHYbz49g</string>
