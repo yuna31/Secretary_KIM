@@ -59,7 +59,7 @@ public class DBnotification extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery("SELECT * FROM NotiOnOff", null);
 
         while (cursor.moveToNext()) {
-            result += cursor.getString(1);
+            result = cursor.getString(1);
         }
 
         return result;
