@@ -33,6 +33,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.util.IOUtils;
 import com.example.home.secretary_kim.LOGIN.LoginActivity;
+import com.google.vr.sdk.widgets.pano.VrPanoramaView;
 import com.kakao.network.ErrorResult;
 import com.kakao.usermgmt.UserManagement;
 import com.kakao.usermgmt.callback.MeV2ResponseCallback;
@@ -66,14 +67,15 @@ import java.util.List;
 
 public class S3DownloadActivity extends AppCompatActivity {
     String ReceiverEmail;
-    ImageView imageView;
-    Bitmap bmp;
+//    ImageView imageView;
+//    Bitmap bmp;
     String fileName = "";
+    private VrPanoramaView.Options panoOptions = new VrPanoramaView.Options();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_s3download);
+        setContentView(R.layout.vr_layout);
 
         ImageView imageView = (ImageView) findViewById(R.id.bitmapView);
         Button oldfileButton = (Button) findViewById(R.id.oldfilebutton);
@@ -118,16 +120,17 @@ public class S3DownloadActivity extends AppCompatActivity {
                             byte[] bytes = IOUtils.toByteArray(is);
                             System.out.println("********************download bytearray : " + bytes);
                             System.out.println("********************temp length : " + bytes.length);
-                            bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-
-                            //UI를 변경하기 위한 Thread
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    ImageView imageView = (ImageView) findViewById(R.id.bitmapView);
-                                    imageView.setImageBitmap(bmp);
-                                }
-                            });
+                            set(bytes);
+//                            bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+//
+//                            //UI를 변경하기 위한 Thread
+//                            runOnUiThread(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    ImageView imageView = (ImageView) findViewById(R.id.bitmapView);
+//                                    imageView.setImageBitmap(bmp);
+//                                }
+//                            });
 
                             is.close();
                         } catch (IOException e){
@@ -262,5 +265,15 @@ public class S3DownloadActivity extends AppCompatActivity {
                 System.out.println("@@@@@@@@@@Email : " + ReceiverEmail);
             }
         });
+    }
+
+    public void set(byte[] bytes){
+        VrPanoramaView panoramaView;
+        Bitmap bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+
+        panoramaView = (VrPanoramaView)findViewById(R.id.pano_view);
+        panoramaView.setDisplayMode(1);
+        panoOptions.inputType = VrPanoramaView.Options.TYPE_STEREO_OVER_UNDER;
+        panoramaView.loadImageFromBitmap(bmp, panoOptions);
     }
 }
