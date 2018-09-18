@@ -75,7 +75,7 @@ public class S3DownloadActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.vr_layout);
+        setContentView(R.layout.vr_layout_btn);
 
         ImageView imageView = (ImageView) findViewById(R.id.bitmapView);
         Button oldfileButton = (Button) findViewById(R.id.oldfilebutton);

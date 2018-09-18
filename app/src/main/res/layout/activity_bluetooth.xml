@@ -1,21 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<LinearLayout tools:context=".VR.BluetoothActivity"
-    android:orientation="vertical"
-    android:layout_height="match_parent"
-    android:layout_width="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_vertical|center"
+    android:orientation="vertical"
+    tools:context=".VR.BluetoothActivity">
 
     <Button
-        android:layout_height="wrap_content"
+        android:id="@+id/bluetooth_btn"
         android:layout_width="wrap_content"
-        android:text="블루투스"
-        android:id="@+id/bluetooth_btn"/>
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:text="블루투스" />
 
-    <Button android:layout_height="wrap_content" android:layout_width="wrap_content" android:text="이동요청" android:id="@+id/request_btn"/>
+    <Button
+        android:id="@+id/request_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="이동요청" />
 
-    <Button android:layout_height="wrap_content" android:layout_width="wrap_content" android:text="긴급호출" android:id="@+id/sos_btn"/>
+    <Button
+        android:id="@+id/sos_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="긴급호출" />
 
 </LinearLayout>
