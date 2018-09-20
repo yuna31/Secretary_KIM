@@ -48,8 +48,8 @@ public class FragmentList extends Fragment {
     private ListAdapter adapter;
     private String[][] path;
     private ListView listView;
-    private ImageButton search;
-    private ImageButton add;
+    //private ImageButton search;
+    //private ImageButton add;
     String ReceiverEmail;
 
     public static int Unamecnt,newFileNamecnt, Umailcnt;
@@ -83,7 +83,7 @@ public class FragmentList extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         listView = (ListView) view.findViewById(R.id.list_view);
-        search = (ImageButton) view.findViewById(R.id.search_button);
+        //search = (ImageButton) view.findViewById(R.id.search_button);
         //add = (ImageButton) view.findViewById(R.id.add_button);
 
         requestMe();
@@ -130,13 +130,6 @@ public class FragmentList extends Fragment {
 
                         adapter = new ListAdapter(context, path, true);
                         listView.setAdapter(adapter);
-
-                        search.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                //
-                            }
-                        });
 
                         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                             @Override
