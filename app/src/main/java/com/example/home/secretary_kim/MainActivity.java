@@ -47,8 +47,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
-import static com.example.home.secretary_kim.tempS3Upload.getContext;
-
 public class MainActivity extends AppCompatActivity
         implements
             BottomNavigationView.OnNavigationItemSelectedListener,
