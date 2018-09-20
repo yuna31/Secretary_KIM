@@ -17,6 +17,10 @@ import android.view.ViewGroup;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+/**
+ * Created by yuna on 2018-08-10.
+ */
+
 public class FragmentMap  extends BottomSheetDialogFragment {
     private BottomSheetBehavior mBehavior;
     private RecyclerView recyclerView;
