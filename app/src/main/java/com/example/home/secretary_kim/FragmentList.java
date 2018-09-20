@@ -38,6 +38,10 @@ import java.util.StringTokenizer;
 
 import static android.app.Activity.RESULT_OK;
 
+/**
+ * Created by yuna on 2018-08-10.
+ */
+
 public class FragmentList extends Fragment {
 
     private Context context;
