@@ -55,11 +55,6 @@ public class MainActivity extends AppCompatActivity
             GoogleMap.OnMyLocationClickListener,
             LocationListener{
 
-    private final int FRAGMENT_MAP = 1;
-    private final int FRAGMENT_LIST = 2;
-    private final int FRAGMENT_SETTING = 3;
-
-
     private LocationManager locationManager;
     private RecyclerView mBottomSheet;
     private BottomSheetBehavior mBehavior;
