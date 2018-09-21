@@ -59,6 +59,8 @@ public class VrPanoramaActivity extends Activity implements SpeechRecognizeListe
 
         SpeechRecognizerManager.getInstance().initializeLibrary(this);
 
+        locationClass = new LocationClass(VrPanoramaActivity.this);
+
         panoramaView = (VrPanoramaView)findViewById(R.id.pano_view);
         panoramaView.setEventListener(new ActivityEventListener());
 

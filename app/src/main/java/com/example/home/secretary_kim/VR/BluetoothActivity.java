@@ -18,7 +18,9 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.home.secretary_kim.EmergencyActivity;
+import com.example.home.secretary_kim.MainActivity;
 import com.example.home.secretary_kim.R;
+import com.example.home.secretary_kim.SpeechActivity;
 
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
@@ -48,6 +50,8 @@ public class BluetoothActivity extends AppCompatActivity {
     private Button bluetooth_btn;
     private Button request_btn;
     private Button sos_btn;
+    private Button s0woo_btn;
+    private Button yuna_btn;
 
     private BluetoothService bluetoothService = null;
     private StringBuffer mOutStringBuffer;
@@ -167,6 +171,24 @@ public class BluetoothActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(getApplicationContext(), EmergencyActivity.class);
+                startActivityForResult(i, 0);
+            }
+        });
+
+        s0woo_btn = (Button) findViewById(R.id.s0woo_btn);
+        s0woo_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(getApplicationContext(), SpeechActivity.class);
+                startActivityForResult(i, 0);
+            }
+        });
+
+        yuna_btn = (Button) findViewById(R.id.yuna_btn);
+        yuna_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(getApplicationContext(), MainActivity.class);
                 startActivityForResult(i, 0);
             }
         });

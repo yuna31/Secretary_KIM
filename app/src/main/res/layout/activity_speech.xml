@@ -71,6 +71,20 @@
             android:id="@+id/storagebutton"
             android:text="storage_button" />
 
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:id="@+id/downloadbutton"
+            android:text="download_button" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:id="@+id/makelistbutton"
+            android:text="makelist_button" />
+
     </LinearLayout>
 
 

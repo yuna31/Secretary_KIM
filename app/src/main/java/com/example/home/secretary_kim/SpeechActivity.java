@@ -7,9 +7,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -20,7 +20,6 @@ import com.kakao.sdk.newtoneapi.SpeechRecognizerManager;
 import com.kakao.sdk.newtoneapi.impl.util.PermissionUtils;
 
 import java.util.ArrayList;
-import java.util.StringTokenizer;
 
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
@@ -51,7 +50,6 @@ public class SpeechActivity extends Activity implements View.OnClickListener, Sp
             //startUsingSpeechSDK();
         }
 
-
         SpeechRecognizerManager.getInstance().initializeLibrary(this);
         findViewById(R.id.speechbutton).setOnClickListener(this);
         findViewById(R.id.cancelbutton).setOnClickListener(this);
@@ -60,14 +58,16 @@ public class SpeechActivity extends Activity implements View.OnClickListener, Sp
         findViewById(R.id.uibutton).setOnClickListener(this);
         findViewById(R.id.connectbutton).setOnClickListener(this);
         findViewById(R.id.storagebutton).setOnClickListener(this);
+        findViewById(R.id.downloadbutton).setOnClickListener(this);
+        findViewById(R.id.makelistbutton).setOnClickListener(this);
         setButtonsStatus(true);
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case 1:
-                if (grantResults.length > 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.length > 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED ) {
                     //startUsingSpeechSDK();
                 } else {
                     finish();
@@ -78,7 +78,6 @@ public class SpeechActivity extends Activity implements View.OnClickListener, Sp
         }
     }
 
-
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -88,14 +87,10 @@ public class SpeechActivity extends Activity implements View.OnClickListener, Sp
     }
 
     private void setButtonsStatus(boolean enabled) {
-        findViewById(R.id.connectbutton).setEnabled(enabled);
-        findViewById(R.id.storagebutton).setEnabled(enabled);
-        /*
         findViewById(R.id.speechbutton).setEnabled(enabled);
         findViewById(R.id.restartbutton).setEnabled(!enabled);
         findViewById(R.id.cancelbutton).setEnabled(!enabled);
         findViewById(R.id.stopbutton).setEnabled(!enabled);
-        */
     }
 
     @Override
@@ -104,7 +99,7 @@ public class SpeechActivity extends Activity implements View.OnClickListener, Sp
 
         String serviceType = SpeechRecognizerClient.SERVICE_TYPE_WEB;
 
-        /*
+
         // 음성인식 버튼 listener
         if (id == R.id.speechbutton) {
             if(PermissionUtils.checkAudioRecordPermission(this)) {
@@ -112,17 +107,7 @@ public class SpeechActivity extends Activity implements View.OnClickListener, Sp
                 SpeechRecognizerClient.Builder builder = new SpeechRecognizerClient.Builder().
                         setServiceType(serviceType);
 
-               // if 주석처리해야함
-                if (serviceType.equals(SpeechRecognizerClient.SERVICE_TYPE_WORD)) {
-                    EditText words = (EditText)findViewById(R.id.words_edit);
-                    String wordList = words.getText().toString();
-                    builder.setUserDictionary(wordList);
-
-                    Log.i("SpeechSampleActivity", "word list : " + wordList.replace('\n', ','));
-                }
-
                 client = builder.build();
-
                 client.setSpeechRecognizeListener(this);
                 client.startRecording(true);
 
@@ -149,7 +134,7 @@ public class SpeechActivity extends Activity implements View.OnClickListener, Sp
             if (client != null) {
                 client.stopRecording();
             }
-        }*/
+        }
 
         if (id == R.id.uibutton) {
             Intent i = new Intent(getApplicationContext(), VoiceRecoActivity.class);
@@ -162,6 +147,16 @@ public class SpeechActivity extends Activity implements View.OnClickListener, Sp
         }
         else if (id == R.id.storagebutton) {
             Intent i = new Intent(getApplicationContext(), S3UploadActivity.class);
+            startActivityForResult(i, 0);
+            //tempS3Upload tempS3Upload = new tempS3Upload();
+            //tempS3Upload.main();
+        }
+        else if (id == R.id.downloadbutton) {
+            Intent i = new Intent(getApplicationContext(), S3DownloadActivity.class);
+            startActivityForResult(i, 0);
+        }
+        else if (id == R.id.makelistbutton) {
+            Intent i = new Intent(getApplicationContext(), MakeUserListActivity.class);
             startActivityForResult(i, 0);
         }
     }
@@ -251,10 +246,9 @@ public class SpeechActivity extends Activity implements View.OnClickListener, Sp
     public void detachString(String result) {
         if(result.length()>7) {
             String from = result.substring(0,3);
-            String to = result.substring(((result.length())-4), result.length());
+            String to = result.substring(5,9);
             //System.out.println("*************************************시작: "+ from + "도착" + to);
             Toast.makeText(getApplicationContext(),"시작: "+ from + " 도착: " + to, Toast.LENGTH_LONG).show();
-
         }
     }
 
@@ -275,7 +269,7 @@ public class SpeechActivity extends Activity implements View.OnClickListener, Sp
 
     @Override
     public void onError(int errorCode, String errorMsg) {
-        Log.e("SpeechSampleActivity", "onError");
+
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -293,20 +287,20 @@ public class SpeechActivity extends Activity implements View.OnClickListener, Sp
 
     //버튼사용하는 결과창
     @Override
-    public void onResults(Bundle results) {
+    public void onResults(final Bundle results) {
         final StringBuilder builder = new StringBuilder();
-        Log.i("SpeechSampleActivity", "onResults");
 
-        ArrayList<String> texts = results.getStringArrayList(SpeechRecognizerClient.KEY_RECOGNITION_RESULTS);
-        ArrayList<Integer> confs = results.getIntegerArrayList(SpeechRecognizerClient.KEY_CONFIDENCE_VALUES);
+        final ArrayList<String> texts = results.getStringArrayList(SpeechRecognizerClient.KEY_RECOGNITION_RESULTS);
+        final ArrayList<Integer> confs = results.getIntegerArrayList(SpeechRecognizerClient.KEY_CONFIDENCE_VALUES);
 
+        /*전체 결과 다 받아오기
         for (int i = 0; i < texts.size(); i++) {
             builder.append(texts.get(i));
             builder.append(" (");
             builder.append(confs.get(i).intValue());
             builder.append(")\n");
         }
-
+        */
 
         final Activity activity = this;
         runOnUiThread(new Runnable() {
@@ -315,6 +309,12 @@ public class SpeechActivity extends Activity implements View.OnClickListener, Sp
                 // finishing일때는 처리하지 않는다.
                 if (activity.isFinishing()) return;
 
+                builder.append(texts.get(0));
+                builder.append(" (가능성 : ");
+                builder.append(confs.get(0).intValue());
+                builder.append(")\n");
+                makeAlertDialog(builder.toString());
+                /*
                 AlertDialog.Builder dialog = new AlertDialog.Builder(activity).
                         setMessage(builder.toString()).
                         setPositiveButton("확인", new DialogInterface.OnClickListener() {
@@ -324,6 +324,7 @@ public class SpeechActivity extends Activity implements View.OnClickListener, Sp
                             }
                         });
                 dialog.show();
+                */
 
                 setButtonsStatus(true);
             }
@@ -334,12 +335,10 @@ public class SpeechActivity extends Activity implements View.OnClickListener, Sp
 
     @Override
     public void onAudioLevel(float audioLevel) {
-
     }
 
     @Override
     public void onFinished() {
-        Log.i("SpeechSampleActivity", "onFinished");
     }
 
 }

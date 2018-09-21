@@ -16,7 +16,6 @@ import com.example.home.secretary_kim.LOGIN.LoginActivity;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
 import com.kakao.network.ErrorResult;
-import com.kakao.network.NetworkTask;
 import com.kakao.usermgmt.UserManagement;
 import com.kakao.usermgmt.callback.MeV2ResponseCallback;
 import com.kakao.usermgmt.response.MeV2Response;

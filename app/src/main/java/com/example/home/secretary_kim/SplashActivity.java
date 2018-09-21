@@ -1,7 +1,6 @@
 package com.example.home.secretary_kim;
 
 import android.app.Activity;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -9,9 +8,7 @@ import android.os.Handler;
 import android.widget.Toast;
 
 import com.example.home.secretary_kim.LOGIN.LoginActivity;
-import com.example.home.secretary_kim.LOGIN.SelectRoleActivity;
 import com.example.home.secretary_kim.VR.BluetoothActivity;
-import com.google.common.logging.nano.Vr;
 import com.kakao.network.ErrorResult;
 import com.kakao.usermgmt.UserManagement;
 import com.kakao.usermgmt.callback.MeV2ResponseCallback;
@@ -20,8 +17,6 @@ import com.kakao.util.helper.log.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static java.sql.Types.NULL;
 
 public class SplashActivity extends Activity {
     private Handler handler;

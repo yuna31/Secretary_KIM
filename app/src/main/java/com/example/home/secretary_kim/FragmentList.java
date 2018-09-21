@@ -1,6 +1,6 @@
 package com.example.home.secretary_kim;
 
-import android.app.Activity;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,7 +35,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import static android.app.Activity.RESULT_OK;
+/**
+ * Created by yuna on 2018-08-10.
+ */
 
 public class FragmentList extends Fragment {
 
@@ -44,7 +45,7 @@ public class FragmentList extends Fragment {
     private ListAdapter adapter;
     private String[][] path;
     private ListView listView;
-    private ImageButton search;
+    //private ImageButton search;
     private ImageButton add;
     String ReceiverEmail;
 
@@ -79,7 +80,7 @@ public class FragmentList extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         listView = (ListView) view.findViewById(R.id.list_view);
-        search = (ImageButton) view.findViewById(R.id.search_button);
+        //search = (ImageButton) view.findViewById(R.id.search_button);
         //add = (ImageButton) view.findViewById(R.id.add_button);
 
         requestMe();
@@ -127,12 +128,6 @@ public class FragmentList extends Fragment {
                         adapter = new ListAdapter(context, path, true);
                         listView.setAdapter(adapter);
 
-                        search.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                //
-                            }
-                        });
 
                         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                             @Override

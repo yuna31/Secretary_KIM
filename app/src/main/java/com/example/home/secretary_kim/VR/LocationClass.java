@@ -60,7 +60,7 @@ public class LocationClass {
         String locationProvider = LocationManager.GPS_PROVIDER;
         Location lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
         if (lastKnownLocation != null) {
-            lon = lastKnownLocation.getLatitude();
+            lon = lastKnownLocation.getLongitude();
             lat = lastKnownLocation.getLatitude();
             //Log.d("Main", "longtitude=" + lon + ", latitude=" + lat);
         }

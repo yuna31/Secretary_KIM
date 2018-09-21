@@ -12,10 +12,8 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.example.home.secretary_kim.DBUserORSecretary;
-import com.example.home.secretary_kim.MainActivity;
 import com.example.home.secretary_kim.R;
 import com.example.home.secretary_kim.SecretaryMenuActivity;
-import com.example.home.secretary_kim.SplashActivity;
 import com.example.home.secretary_kim.VR.BluetoothActivity;
 
 public class SelectRoleActivity extends Activity {

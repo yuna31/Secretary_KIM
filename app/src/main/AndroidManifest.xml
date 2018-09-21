@@ -53,11 +53,11 @@
         <activity android:name=".SecretaryMenuActivity" />
 
         <activity android:name=".MainActivity" />
-        
+
         <activity android:name=".SpeechActivity" />
 
         <activity android:name=".VoiceRecoActivity" />
-        
+
         <activity android:name=".MakeConnActivity">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
