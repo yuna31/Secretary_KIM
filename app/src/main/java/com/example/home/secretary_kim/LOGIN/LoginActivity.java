@@ -13,11 +13,13 @@ import com.kakao.util.helper.log.Logger;
 public class LoginActivity extends Activity {
 
     SessionCallback callback;
+    ImageView imageView;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        imageView = (ImageView)findViewById(R.id.log_img);
         callback = new SessionCallback();
         Session.getCurrentSession().addCallback(callback);
 
