@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Secretary_Kim</string>
+    <string name="app_name">김비서</string>
 
     <string name="scanning">scanning for devices...</string>
     <string name="select_device">select a device to connect</string>
