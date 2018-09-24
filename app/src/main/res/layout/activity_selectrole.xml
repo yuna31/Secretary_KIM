@@ -5,31 +5,36 @@
     android:gravity="center"
     android:orientation="vertical">
 
-    <RadioGroup
-        android:id="@+id/radioGroup1"
+    <ImageView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="60dp"
+        android:src="@drawable/t1"
+        android:id="@+id/t1"
+        android:scaleType="centerInside"
+        android:layout_gravity="top"
+        android:background="#00ffffff"/>
 
-        <RadioButton
-            android:id="@+id/radio0"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:text="사용자" />
-
-        <RadioButton
-            android:id="@+id/radio1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="관리자" />
-
-    </RadioGroup>
-
-    <Button
-        android:id="@+id/button1"
+    <ImageButton
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="선택완료" />
+        android:layout_height="80dp"
+        android:layout_marginTop="120dp"
+        android:paddingLeft="50dp"
+        android:paddingRight="50dp"
+        android:src="@drawable/btn_user"
+        android:id="@+id/btn_user"
+        android:scaleType="centerInside"
+        android:background="#00ffffff"/>
 
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="80dp"
+        android:paddingLeft="50dp"
+        android:paddingRight="50dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="30dp"
+        android:src="@drawable/btn_manager"
+        android:id="@+id/btn_manager"
+        android:scaleType="centerInside"
+        android:background="#00ffffff"/>
 
 </LinearLayout>
