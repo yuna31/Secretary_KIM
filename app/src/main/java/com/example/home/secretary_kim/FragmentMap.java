@@ -43,7 +43,7 @@ public class FragmentMap  extends BottomSheetDialogFragment {
         mBehavior = BottomSheetBehavior.from((View) view.getParent());
 
         adapter = new PointAdapter();
-        RecyclerView recyclerView = view.findViewById(R.id.base_recycler_view);
+        recyclerView = view.findViewById(R.id.base_recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         recyclerView.addItemDecoration(new DividerItemDecoration(view.getContext(), DividerItemDecoration.VERTICAL));
         recyclerView.setAdapter(adapter);
