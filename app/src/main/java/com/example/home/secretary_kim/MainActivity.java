@@ -5,7 +5,6 @@ import android.annotation.SuppressLint;
 import android.app.FragmentManager;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.content.ReceiverCallNotAllowedException;
 import android.location.Location;
 import android.location.LocationListener;
@@ -33,6 +32,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.gun0912.tedpermission.PermissionListener;
@@ -70,9 +70,9 @@ public class MainActivity extends AppCompatActivity
     private PointAdapter adapter;
     FragmentMap f;
 
-    public static int latlonCnt = 0;
-    public static String[] latitude = new String[20];
-    public static String[] longitude = new String[20];
+    public static int latCnt = 0, lonCnt = 0;
+    public static String[] latitude = new String[10];
+    public static String[] longitude = new String[10];
 
     private void showBottomSheetView() {
         mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
@@ -85,7 +85,6 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(this);
-
 
         final Handler handler = new Handler();
         new Thread() {
@@ -144,7 +143,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        adapter = new PointAdapter();
+        adapter = new PointAdapter(getApplicationContext());
         mBottomSheet.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         mBottomSheet.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         mBottomSheet.setAdapter(adapter);
@@ -203,13 +202,9 @@ public class MainActivity extends AppCompatActivity
                 //showBottomSheetView();
                 return true;
             case R.id.navigation_notifications:
-
-//                FragmentSetting setting = new FragmentSetting();
-//                transaction.replace(R.id.container, setting);
-//                transaction.commit();
-                Intent i = new Intent(getApplicationContext(), FragmentSettingActivity.class);
-                startActivityForResult(i, 0);
-
+                FragmentSetting setting = new FragmentSetting();
+                transaction.replace(R.id.container, setting);
+                transaction.commit();
                 //mBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
                 return true;
         }
@@ -220,7 +215,7 @@ public class MainActivity extends AppCompatActivity
     private ArrayList<LatLng> getMapPoint(GoogleMap googleMap) {
         ArrayList<LatLng> list = new ArrayList<>();
 
-        for(int i = 0; i < latlonCnt; i++) {
+        for(int i = 0; i < latCnt; i++) {
             if(i%2 == 1) {
                 list.add(getLatLng("!긴급!", Double.parseDouble(latitude[i]), Double.parseDouble(longitude[i]), googleMap));
             }
@@ -243,7 +238,7 @@ public class MainActivity extends AppCompatActivity
         MarkerOptions m = new MarkerOptions();
         m.position(l);
         m.title(title);
-
+        //m.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker));
         googleMap.addMarker(m);
 
         return l;
@@ -348,9 +343,6 @@ public class MainActivity extends AppCompatActivity
 //                //finish();
 //            }
 
-            int latCnt = 0;
-            int lonCnt = 0;
-
             StringTokenizer str = new StringTokenizer(s, "{\"\":\\/\",\"\":\\/\"}");
             int countTokens = str.countTokens();
             System.out.println("token 수 : " + countTokens);
@@ -371,7 +363,6 @@ public class MainActivity extends AppCompatActivity
                     lonCnt++;
                 }
             }
-            latlonCnt = latCnt;
 
 //            System.out.println("in function get count " + Umailcnt);
         }
