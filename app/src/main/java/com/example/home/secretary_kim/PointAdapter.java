@@ -1,12 +1,15 @@
 package com.example.home.secretary_kim;
- import android.content.ContentValues;
+
+import android.content.Context;
+import android.content.ContentValues;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
- import java.io.BufferedReader;
+
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -17,11 +20,13 @@ import java.util.ArrayList;
 import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
- import static com.google.vr.cardboard.ThreadUtils.runOnUiThread;
+
+import static com.google.vr.cardboard.ThreadUtils.runOnUiThread;
  public class PointAdapter extends RecyclerView.Adapter<PointHolder> {
     public ArrayList<Point> list = new ArrayList<>();
     private double latitude = 37.517400f;
     private double longitude = 127.021924f;
+    Context context;
      public static int latlonCnt = 0;
     public static String[] latitudeArray = new String[10];
     public static String[] longitudeArray = new String[10];
@@ -41,24 +46,21 @@ import java.util.TimerTask;
             }
         }.start();
          list = getMapPoint();
+         this.context = context;
     }
     @NonNull
     @Override
-    public PointHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+   
     public PointHolder onCreateViewHolder(@NonNull final ViewGroup parent, int viewType) {
          return new PointHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.holder_point, parent, false));
      }
      @Override
     public void onBindViewHolder(@NonNull PointHolder holder, int position) {
-        holder.set(latitude, longitude, list.get(position));
+        holder.set(context,latitude, longitude, list.get(position));
 @@ -40,11 +80,16 @@ public void setPoint(double latitude, double longitude) {
     private ArrayList<Point> getMapPoint() {
         ArrayList<Point> list = new ArrayList<>();
-         list.add(getPoint("맥도날드", 37.5147400f, 127.021924f));
-        list.add(getPoint("가로수길", 37.519446f, 127.023126f));
-        list.add(getPoint("아오리의 행방불명", 37.519059f, 127.023776f));
-        list.add(getPoint("키친랩 가로수길점", 37.521601f, 127.021769f));
-        list.add(getPoint("C27 가로수길점", 37.520711f, 127.023231f));
+
         for(int i = 0; i < latlonCnt; i++)
         {
            list.add(getPoint(i+"번째", Double.parseDouble(latitudeArray[i]), Double.parseDouble(longitudeArray[i])));
@@ -71,7 +73,7 @@ import java.util.TimerTask;
 //        list.add(getPoint("C27 가로수길점", 37.520711f, 127.023231f));
          return list;
     }
-@@ -57,4 +102,118 @@ private Point getPoint(String name, double latitude, double longitude){
+private Point getPoint(String name, double latitude, double longitude){
          return p;
     }
      public class NetworkTask extends AsyncTask<Void, Void, String> {
