@@ -27,12 +27,7 @@ public class MyFirebaseMessagingService extends com.google.firebase.messaging.Fi
         dbNoti = NotiOnOff.getWritableDatabase();
         NotiOnOff.onCreate(dbNoti);
         ContentValues values = new ContentValues();
-        values.put("id", 1);
-        values.put("OnOff", "ON");
-        //values.put("OnOff", "OFF");
-        dbNoti.insert("NotiOnOff", null,values);
-        //dbNoti.update("NotiOnOff", values, "1", null);
-        //dbNoti.delete("NotiOnOff", "1", null);
+       
         String notification = NotiOnOff.getResult();
         System.out.println("noti On/Off : " + notification);
 
