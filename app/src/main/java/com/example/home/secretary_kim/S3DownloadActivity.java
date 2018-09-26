@@ -7,18 +7,29 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.renderscript.ScriptGroup;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.http.HttpResponse;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.GetObjectMetadataRequest;
+import com.amazonaws.services.s3.model.GetObjectRequest;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.util.IOUtils;
 import com.example.home.secretary_kim.LOGIN.LoginActivity;
@@ -29,17 +40,24 @@ import com.kakao.usermgmt.callback.MeV2ResponseCallback;
 import com.kakao.usermgmt.response.MeV2Response;
 import com.kakao.util.helper.log.Logger;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.net.HttpRetryException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,18 +67,17 @@ import java.util.List;
 
 public class S3DownloadActivity extends AppCompatActivity {
     String ReceiverEmail;
-//    ImageView imageView;
-//    Bitmap bmp;
     String fileName = "";
+
     private VrPanoramaView.Options panoOptions = new VrPanoramaView.Options();
+
+    private Button ok_btn;
+    private Button old_btn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.vr_layout_btn);
-
-        ImageView imageView = (ImageView) findViewById(R.id.bitmapView);
-        Button oldfileButton = (Button) findViewById(R.id.oldfilebutton);
 
         requestMe();
 
@@ -124,6 +141,27 @@ public class S3DownloadActivity extends AppCompatActivity {
                 }.start();
             }
         },4000);
+
+        ok_btn = (Button) findViewById(R.id.ok_btn);
+        ok_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(getApplicationContext(), MainActivity.class);
+                startActivityForResult(i, 0);
+                finish();
+            }
+        });
+
+        old_btn = (Button) findViewById(R.id.old_btn);
+        old_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(getApplicationContext(), S3DownloadOldActivity.class);
+                startActivityForResult(i, 0);
+                finish();
+            }
+        });
+
     }
 
     public class NetworkTask extends AsyncTask<Void, Void, String> {
@@ -243,7 +281,7 @@ public class S3DownloadActivity extends AppCompatActivity {
             public void onSuccess(MeV2Response response) {
                 Logger.d("email: " + response.getKakaoAccount().getEmail());
                 ReceiverEmail = response.getKakaoAccount().getEmail();
-                Toast.makeText(getApplicationContext(), "kakao email : " + response.getKakaoAccount().getEmail(), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(), "kakao email : " + response.getKakaoAccount().getEmail(), Toast.LENGTH_SHORT).show();
                 System.out.println("@@@@@@@@@@Email : " + ReceiverEmail);
             }
         });
