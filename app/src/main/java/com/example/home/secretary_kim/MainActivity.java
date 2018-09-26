@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.FragmentManager;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.ReceiverCallNotAllowedException;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -19,9 +20,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -42,6 +46,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class MainActivity extends AppCompatActivity
@@ -63,7 +69,7 @@ public class MainActivity extends AppCompatActivity
     private PointAdapter adapter;
     FragmentMap f;
 
-    public static int latCnt, lonCnt;
+    public static int latCnt = 0, lonCnt = 0;
     public static String[] latitude = new String[10];
     public static String[] longitude = new String[10];
 
@@ -89,7 +95,7 @@ public class MainActivity extends AppCompatActivity
                         NetworkTask networkTask = new NetworkTask(url, null);
                         networkTask.execute();
                     }
-                }, 800);
+                }, 300);
             }
         }.start();
 
@@ -101,7 +107,7 @@ public class MainActivity extends AppCompatActivity
                     public void run() {
                         makeMap();
                     }
-                }, 1500);
+                }, 1000);
             }
         }.start();
 
@@ -141,6 +147,18 @@ public class MainActivity extends AppCompatActivity
         mBottomSheet.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         mBottomSheet.setAdapter(adapter);
         mBehavior.setPeekHeight(300);
+
+//        new Timer().schedule(new TimerTask() {
+//            public void run() {
+//                runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//
+//                    }
+//                });
+//            }
+//         }, 1200);
+
     }
 
     void makeMap() {
@@ -197,10 +215,14 @@ public class MainActivity extends AppCompatActivity
         ArrayList<LatLng> list = new ArrayList<>();
 
         for(int i = 0; i < latCnt; i++) {
-            list.add(getLatLng(i+"번째", Double.parseDouble(latitude[i]), Double.parseDouble(longitude[i]), googleMap));
+            if(i%2 == 1) {
+                list.add(getLatLng("!긴급!", Double.parseDouble(latitude[i]), Double.parseDouble(longitude[i]), googleMap));
+            }
+            else {
+                list.add(getLatLng(i+"번째", Double.parseDouble(latitude[i]), Double.parseDouble(longitude[i]), googleMap));
+            }
         }
 
-//         list.add(getLatLng("맥도날드", 37.5147400f, 127.021924f, googleMap));
 //        list.add(getLatLng("가로수길", 37.519446f, 127.023126f, googleMap));
 //        list.add(getLatLng("아오리의 행방불명", 37.519059f, 127.023776f, googleMap));
 //        list.add(getLatLng("키친랩 가로수길점", 37.521601f, 127.021769f, googleMap));
@@ -257,8 +279,8 @@ public class MainActivity extends AppCompatActivity
     @SuppressLint("MissingPermission")
     @Override
     public boolean onMyLocationButtonClick() {
-        Toast.makeText(this, "onMyLocationButtonClick", Toast.LENGTH_SHORT).show();
-        Toast.makeText(this, "현재 위치값 받아오는중", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "onMyLocationButtonClick", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "현재 위치값 받아오는중", Toast.LENGTH_SHORT).show();
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, MainActivity.this);
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0, MainActivity.this);
@@ -273,7 +295,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onLocationChanged(Location location) {
-        Toast.makeText(this, "현재 위치 받아옴", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "현재 위치 받아옴", Toast.LENGTH_SHORT).show();
         adapter.setPoint(location.getLatitude(), location.getLongitude());
         locationManager.removeUpdates(MainActivity.this);
     }
@@ -320,7 +342,7 @@ public class MainActivity extends AppCompatActivity
 //                //finish();
 //            }
 
-            StringTokenizer str = new StringTokenizer(s, "{\"\":\\/\"}");
+            StringTokenizer str = new StringTokenizer(s, "{\"\":\\/\",\"\":\\/\"}");
             int countTokens = str.countTokens();
             System.out.println("token 수 : " + countTokens);
 
