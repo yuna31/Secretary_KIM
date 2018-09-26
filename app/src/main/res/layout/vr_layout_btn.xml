@@ -22,6 +22,13 @@
             android:layout_height="wrap_content"
             android:text="확인" />
 
+        <Button
+            android:layout_marginLeft="30dp"
+            android:id="@+id/old_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="이전 사진 확인" />
+
     </LinearLayout>
 
 </RelativeLayout>
