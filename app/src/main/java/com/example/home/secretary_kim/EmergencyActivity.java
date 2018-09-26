@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.home.secretary_kim.LOGIN.LoginActivity;
+import com.example.home.secretary_kim.VR.LocationClass;
 import com.kakao.network.ErrorResult;
 import com.kakao.usermgmt.UserManagement;
 import com.kakao.usermgmt.callback.MeV2ResponseCallback;
@@ -36,6 +37,7 @@ import java.util.List;
 
 public class EmergencyActivity extends AppCompatActivity {
     String SenderEmail; String SenderName;
+    private LocationClass locationClass;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,7 +113,7 @@ public class EmergencyActivity extends AppCompatActivity {
             String userName = SenderName;
             String userID = SenderEmail; //수정할것
             //*******************************************************
-            String place ="";
+            String place = locationClass.getLoc();
             String message = SenderName + "님의 긴급호출입니다 (" + place + ")";
 
             //StringBuffer에 파라미터 연결
