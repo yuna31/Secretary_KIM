@@ -1,11 +1,19 @@
 package com.example.home.secretary_kim;
 
+import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-public class PointHolder extends RecyclerView.ViewHolder {
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+
+public class PointHolder extends RecyclerView.ViewHolder{
     TextView title;
     TextView distance;
 
@@ -15,8 +23,21 @@ public class PointHolder extends RecyclerView.ViewHolder {
         distance = itemView.findViewById(R.id.holder_point_distance);
     }
 
-    public void set(double dlati, double dlongi, Point point) {
-        title.setText(point.name);
+    public void set(Context context, double dlati, double dlongi, Point point) {
+        String name = null;
+        try {
+            Geocoder geocoder = new Geocoder(context, Locale.KOREA);
+
+            List<Address> address = geocoder.getFromLocation(dlati, dlongi, 1);
+            if (address != null && address.size() > 0) {
+                name = address.get(0).getAddressLine(0).toString();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.e("*","지명에러");
+        }
+
+        this.title.setText(name);
         String distance = convert(getCurrentDistance(dlati, dlongi, point.latitude, point.longtitude));
         this.distance.setText(distance);
     }
