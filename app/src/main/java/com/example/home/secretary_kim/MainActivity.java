@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.FragmentManager;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.ReceiverCallNotAllowedException;
 import android.location.Location;
 import android.location.LocationListener;
@@ -69,9 +70,9 @@ public class MainActivity extends AppCompatActivity
     private PointAdapter adapter;
     FragmentMap f;
 
-    public static int latCnt = 0, lonCnt = 0;
-    public static String[] latitude = new String[10];
-    public static String[] longitude = new String[10];
+    public static int latlonCnt = 0;
+    public static String[] latitude = new String[20];
+    public static String[] longitude = new String[20];
 
     private void showBottomSheetView() {
         mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
@@ -84,6 +85,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(this);
+
 
         final Handler handler = new Handler();
         new Thread() {
@@ -201,9 +203,13 @@ public class MainActivity extends AppCompatActivity
                 //showBottomSheetView();
                 return true;
             case R.id.navigation_notifications:
-                FragmentSetting setting = new FragmentSetting();
-                transaction.replace(R.id.container, setting);
-                transaction.commit();
+
+//                FragmentSetting setting = new FragmentSetting();
+//                transaction.replace(R.id.container, setting);
+//                transaction.commit();
+                Intent i = new Intent(getApplicationContext(), FragmentSettingActivity.class);
+                startActivityForResult(i, 0);
+
                 //mBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
                 return true;
         }
@@ -214,7 +220,7 @@ public class MainActivity extends AppCompatActivity
     private ArrayList<LatLng> getMapPoint(GoogleMap googleMap) {
         ArrayList<LatLng> list = new ArrayList<>();
 
-        for(int i = 0; i < latCnt; i++) {
+        for(int i = 0; i < latlonCnt; i++) {
             if(i%2 == 1) {
                 list.add(getLatLng("!긴급!", Double.parseDouble(latitude[i]), Double.parseDouble(longitude[i]), googleMap));
             }
@@ -342,6 +348,9 @@ public class MainActivity extends AppCompatActivity
 //                //finish();
 //            }
 
+            int latCnt = 0;
+            int lonCnt = 0;
+
             StringTokenizer str = new StringTokenizer(s, "{\"\":\\/\",\"\":\\/\"}");
             int countTokens = str.countTokens();
             System.out.println("token 수 : " + countTokens);
@@ -362,6 +371,7 @@ public class MainActivity extends AppCompatActivity
                     lonCnt++;
                 }
             }
+            latlonCnt = latCnt;
 
 //            System.out.println("in function get count " + Umailcnt);
         }
