@@ -69,6 +69,8 @@
         </activity>
 
         <activity android:name=".S3DownloadActivity" />
+        
+        <activity android:name=".S3DownloadOldActivity" />
 
         <activity android:name=".MakeUserListActivity" />
 
