@@ -7,15 +7,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingLeft="20dp">
+        android:paddingLeft="20dp"
+        android:gravity="center">
 
         <ImageView
             android:id="@+id/photo"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:layout_alignParentLeft="true"
+            android:layout_gravity="center"
             android:layout_marginRight="5dp"
             android:layout_marginTop="5dp"
+            android:gravity="center"
             android:scaleType="fitCenter" />
 
         <LinearLayout
@@ -28,14 +31,14 @@
                 android:id="@+id/label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="15sp"
-                android:paddingBottom="4dp"/>
+                android:paddingBottom="4dp"
+                android:textSize="13sp" />
 
             <TextView
                 android:id="@+id/data"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="15sp"
+                android:textSize="13sp"
                 android:textColor="#8b8b8b" />
         </LinearLayout>
 
