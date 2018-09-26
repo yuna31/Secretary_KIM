@@ -61,6 +61,9 @@ public class BluetoothActivity extends AppCompatActivity {
 
     private ProgressDialog prBar;
 
+    public LocationClass locationClass;
+    public static String loc;
+
     //블루투스로 값 받아오는 핸들러
     private final Handler mHandler = new Handler(){
         public void handleMessage(Message msg){
@@ -166,10 +169,14 @@ public class BluetoothActivity extends AppCompatActivity {
             }
         });
 
+        locationClass = new LocationClass(this);
+
         sos_btn = (Button) findViewById(R.id.sos_btn);
         sos_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                locationClass.initLoc();
+                loc = locationClass.getLoc();
                 Intent i = new Intent(getApplicationContext(), EmergencyActivity.class);
                 startActivityForResult(i, 0);
             }

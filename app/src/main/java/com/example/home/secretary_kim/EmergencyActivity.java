@@ -9,10 +9,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.home.secretary_kim.LOGIN.LoginActivity;
+import com.example.home.secretary_kim.VR.BluetoothActivity;
 import com.example.home.secretary_kim.VR.LocationClass;
 import com.kakao.network.ErrorResult;
 import com.kakao.usermgmt.UserManagement;
@@ -37,7 +39,8 @@ import java.util.List;
 
 public class EmergencyActivity extends AppCompatActivity {
     String SenderEmail; String SenderName;
-    private LocationClass locationClass;
+//    public LocationClass locationClass;
+//    String loc;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +48,10 @@ public class EmergencyActivity extends AppCompatActivity {
         setContentView(R.layout.activity_emergency);
 
         TextView textView = (TextView)findViewById(R.id.textview);
+//        locationClass = new LocationClass(EmergencyActivity.this);
+//        locationClass.initLoc();
+//        loc = locationClass.getLoc();
+//        Log.d("EMERGENCY", loc);
 
         //업로드 성공하면 다음 동작 수행해야함
         requestMe();
@@ -58,7 +65,6 @@ public class EmergencyActivity extends AppCompatActivity {
                 networkTask.execute();
             }
         }, 1300);
-
     }
 
     @Override
@@ -113,7 +119,7 @@ public class EmergencyActivity extends AppCompatActivity {
             String userName = SenderName;
             String userID = SenderEmail; //수정할것
             //*******************************************************
-            String place = locationClass.getLoc();
+            String place = BluetoothActivity.loc;
             String message = SenderName + "님의 긴급호출입니다 (" + place + ")";
 
             //StringBuffer에 파라미터 연결

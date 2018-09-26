@@ -16,7 +16,7 @@ public class LocationClass {
 
     Context mContext;
 
-    LocationClass(Context mContext){
+    public LocationClass(Context mContext){
         this.mContext = mContext;
         lon = 0;
         lat = 0;
@@ -27,9 +27,9 @@ public class LocationClass {
 
         LocationListener locationListener = new LocationListener() {
             public void onLocationChanged(Location location) {
-                double lat = location.getLatitude();
-                double lng = location.getLongitude();
-                System.out.println("latitude: " + lat + ", longitude: " + lng);
+                lat = location.getLatitude();
+                lon = location.getLongitude();
+                System.out.println("latitude: " + lat + ", longitude: " + lon);
             }
 
             public void onStatusChanged(String provider, int status, Bundle extras) {
