@@ -127,6 +127,7 @@ public class EmergencyActivity extends AppCompatActivity {
             if (_params == null) {
                 sbParams.append("userID=" + userID);
                 sbParams.append("&message=" + message);
+                sbParams.append("&place=" + place);
             }
 
             try {
