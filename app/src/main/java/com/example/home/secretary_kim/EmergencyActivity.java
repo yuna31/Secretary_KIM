@@ -120,6 +120,7 @@ public class EmergencyActivity extends AppCompatActivity {
             String userID = SenderEmail; //수정할것
             //*******************************************************
             String place = BluetoothActivity.loc;
+            //String place = "0.0/0.0";
             String message = SenderName + "님의 긴급호출입니다 (" + place + ")";
 
             //StringBuffer에 파라미터 연결

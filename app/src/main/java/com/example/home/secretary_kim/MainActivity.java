@@ -352,16 +352,34 @@ public class MainActivity extends AppCompatActivity
             for(int i = 0; i < countTokens; i++) {
                 temp[i] = str.nextToken();
                 System.out.println("**" + i +"번째 토큰 : " + temp[i]);
-
-                if(i % 3 == 0 && i != 0) {
-                    latitude[latCnt] = temp[i];
-                    System.out.println(latCnt + "번째 lat : " + latitude[latCnt]);
-                    latCnt++;
-                } else if(i % 3 == 2 && i != 0) {
-                    longitude[lonCnt] = temp[i];
-                    System.out.println(lonCnt + "번째 lon : " + longitude[lonCnt]);
-                    lonCnt++;
+                if(temp[i].equals("place") || temp[i].equals("place_emer") || temp[i].equals("null") || temp[i].equals("success")){
                 }
+                else{
+                    if(i>1){
+                        if(temp[i-1].equals("place") || temp[i-1].equals("place_emer")) {
+                            if(!temp[i].equals("null")){
+                                longitude[lonCnt] = temp[i];
+                                System.out.println(lonCnt + "번째 lon : " + longitude[lonCnt]);
+                                lonCnt++;
+                            }
+                        }
+                        else if(!temp[i-1].equals("place") || !temp[i-1].equals("place_emer") || !temp[i-1].equals("null")){
+                            latitude[latCnt] = temp[i];
+                            System.out.println(latCnt + "번째 lat : " + latitude[latCnt]);
+                            latCnt++;
+                        }
+                    }
+                }
+
+//                    if(i % 3 == 0 && i != 0) {
+//                        latitude[latCnt] = temp[i];
+//                        System.out.println(latCnt + "번째 lat : " + latitude[latCnt]);
+//                        latCnt++;
+//                    } else if(i % 3 == 2 && i != 0) {
+//                        longitude[lonCnt] = temp[i];
+//                        System.out.println(lonCnt + "번째 lon : " + longitude[lonCnt]);
+//                        lonCnt++;
+//                    }
             }
 
 //            System.out.println("in function get count " + Umailcnt);
