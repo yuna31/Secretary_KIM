@@ -3,6 +3,7 @@ package com.example.home.secretary_kim.LOGIN;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.ImageView;
 
 import com.example.home.secretary_kim.R;
 import com.kakao.auth.ISessionCallback;

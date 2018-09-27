@@ -1,6 +1,7 @@
 package com.example.home.secretary_kim.VR;
 
 import android.Manifest;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -14,7 +15,9 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.example.home.secretary_kim.EmergencyActivity;
@@ -24,7 +27,7 @@ import com.example.home.secretary_kim.SpeechActivity;
 
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
-public class BluetoothActivity extends AppCompatActivity {
+public class BluetoothActivity extends Activity {
 
     private static final String TAG = "BluetoothActivity";
 
@@ -47,9 +50,11 @@ public class BluetoothActivity extends AppCompatActivity {
     public static int arrState;
 
     private static final int CNT_4 = 4;
+
+    private ImageButton request_btn;
+    private ImageButton sos_btn;
+
     private Button bluetooth_btn;
-    private Button request_btn;
-    private Button sos_btn;
     private Button s0woo_btn;
     private Button yuna_btn;
 
@@ -63,6 +68,7 @@ public class BluetoothActivity extends AppCompatActivity {
 
     public LocationClass locationClass;
     public static String loc;
+
 
     //블루투스로 값 받아오는 핸들러
     private final Handler mHandler = new Handler(){
@@ -114,6 +120,7 @@ public class BluetoothActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate");
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_bluetooth);
 
         checkPerm();
@@ -131,9 +138,9 @@ public class BluetoothActivity extends AppCompatActivity {
             finish();
         }
 
+        /*
         bluetooth_btn = (Button)findViewById(R.id.bluetooth_btn);
         bluetooth_btn.setOnClickListener(new Button.OnClickListener(){
-
             @Override
             public void onClick(View view) {
                 if(bluetoothService.getDeviceState()){
@@ -144,12 +151,13 @@ public class BluetoothActivity extends AppCompatActivity {
                 }
             }
         });
+        */
 
         prBar = new ProgressDialog(this);
         prBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         prBar.setMessage("이미지 로딩중입니다");
 
-        request_btn = (Button)findViewById(R.id.request_btn);
+        request_btn = (ImageButton)findViewById(R.id.request_btn);
         request_btn.setOnClickListener(new Button.OnClickListener(){
 
             @Override
@@ -164,14 +172,13 @@ public class BluetoothActivity extends AppCompatActivity {
                     prBar.show();
                 }
                 else{
-                    Toast.makeText(getApplicationContext(), "블루투스 연결 필요", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "블루투스 연결이 필요합니다", Toast.LENGTH_SHORT).show();
+                    bluetoothService.enableBluetooth();
                 }
             }
         });
 
-        locationClass = new LocationClass(this);
-
-        sos_btn = (Button) findViewById(R.id.sos_btn);
+        sos_btn = (ImageButton) findViewById(R.id.sos_btn);
         sos_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -182,6 +189,7 @@ public class BluetoothActivity extends AppCompatActivity {
             }
         });
 
+        /*
         s0woo_btn = (Button) findViewById(R.id.s0woo_btn);
         s0woo_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -198,8 +206,9 @@ public class BluetoothActivity extends AppCompatActivity {
                 Intent i = new Intent(getApplicationContext(), MainActivity.class);
                 startActivityForResult(i, 0);
             }
-        });
+        });*/
     }
+
 
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         Log.d(TAG, "onActivityResult" + resultCode);
