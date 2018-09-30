@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.FragmentManager;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.ReceiverCallNotAllowedException;
 import android.location.Location;
 import android.location.LocationListener;
@@ -28,15 +29,20 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.home.secretary_kim.LOGIN.LoginActivity;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
+import com.kakao.network.ErrorResult;
+import com.kakao.usermgmt.UserManagement;
+import com.kakao.usermgmt.callback.MeV2ResponseCallback;
+import com.kakao.usermgmt.response.MeV2Response;
+import com.kakao.util.helper.log.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -46,6 +52,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -70,9 +77,15 @@ public class MainActivity extends AppCompatActivity
     private PointAdapter adapter;
     FragmentMap f;
 
-    public static int latCnt = 0, lonCnt = 0;
-    public static String[] latitude = new String[10];
-    public static String[] longitude = new String[10];
+    public static int latlonCnt = 0;
+    public static int EmerCnt = 0;
+    public static String[] latitude = new String[20];
+    public static String[] longitude = new String[20];
+    public static String[] latitudeEmer = new String[20];
+    public static String[] longitudeEmer = new String[20];
+    public static String[] name = new String[20];
+    public static int[] placeType = new int[20]; //1 is emergency, 0 is photo
+    String ReceiverEmail;
 
     private void showBottomSheetView() {
         mBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
@@ -86,6 +99,18 @@ public class MainActivity extends AppCompatActivity
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(this);
 
+        final Handler handler2 = new Handler();
+        new Thread() {
+            public void run() {
+                handler2.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                      requestMe();
+                    }
+                }, 10);
+            }
+        }.start();
+
         final Handler handler = new Handler();
         new Thread() {
             public void run() {
@@ -96,7 +121,7 @@ public class MainActivity extends AppCompatActivity
                         NetworkTask networkTask = new NetworkTask(url, null);
                         networkTask.execute();
                     }
-                }, 300);
+                }, 400);
             }
         }.start();
 
@@ -205,7 +230,10 @@ public class MainActivity extends AppCompatActivity
                 FragmentSetting setting = new FragmentSetting();
                 transaction.replace(R.id.container, setting);
                 transaction.commit();
-                //mBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+//                Intent i = new Intent(getApplicationContext(), FragmentSettingActivity.class);
+//                startActivityForResult(i, 0);
+
+//                mBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
                 return true;
         }
 
@@ -215,19 +243,30 @@ public class MainActivity extends AppCompatActivity
     private ArrayList<LatLng> getMapPoint(GoogleMap googleMap) {
         ArrayList<LatLng> list = new ArrayList<>();
 
-        for(int i = 0; i < latCnt; i++) {
-            if(i%2 == 1) {
-                list.add(getLatLng("!긴급!", Double.parseDouble(latitude[i]), Double.parseDouble(longitude[i]), googleMap));
-            }
-            else {
-                list.add(getLatLng(i+"번째", Double.parseDouble(latitude[i]), Double.parseDouble(longitude[i]), googleMap));
-            }
+        for(int i = 0; i < latlonCnt; i++) {
+            list.add(getLatLng(name[i], Double.parseDouble(latitude[i]), Double.parseDouble(longitude[i]), googleMap));
+//            if(i%2 == 1) {
+//                list.add(getLatLng("!긴급!", Double.parseDouble(latitude[i]), Double.parseDouble(longitude[i]), googleMap));
+//            }
+//            else {
+//                list.add(getLatLng((i+1)+"번째", Double.parseDouble(latitude[i]), Double.parseDouble(longitude[i]), googleMap));
+//            }
+        }
+
+        for(int i = 0; i < EmerCnt; i++) {
+            list.add(getLatLng("**긴급**", Double.parseDouble(latitudeEmer[i]), Double.parseDouble(longitudeEmer[i]), googleMap));
+//            if(i%2 == 1) {
+//                list.add(getLatLng("!긴급!", Double.parseDouble(latitude[i]), Double.parseDouble(longitude[i]), googleMap));
+//            }
+//            else {
+//                list.add(getLatLng((i+1)+"번째", Double.parseDouble(latitude[i]), Double.parseDouble(longitude[i]), googleMap));
+//            }
         }
 
 //        list.add(getLatLng("가로수길", 37.519446f, 127.023126f, googleMap));
 //        list.add(getLatLng("아오리의 행방불명", 37.519059f, 127.023776f, googleMap));
 //        list.add(getLatLng("키친랩 가로수길점", 37.521601f, 127.021769f, googleMap));
-//        list.add(getLatLng("C27 가로수길점", 37.520711f, 127.023231f, googleMap));
+//        list.add(getLatLng("0번째", 35.231925f, 129.0907067f, googleMap));
 
         return list;
     }
@@ -238,7 +277,7 @@ public class MainActivity extends AppCompatActivity
         MarkerOptions m = new MarkerOptions();
         m.position(l);
         m.title(title);
-        //m.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker));
+
         googleMap.addMarker(m);
 
         return l;
@@ -291,7 +330,7 @@ public class MainActivity extends AppCompatActivity
     @SuppressLint("MissingPermission")
     @Override
     public void onMyLocationClick(@NonNull Location location) {
-        Toast.makeText(this, "onMyLocationClick", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "onMyLocationClick", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -343,30 +382,56 @@ public class MainActivity extends AppCompatActivity
 //                //finish();
 //            }
 
+            int placeCnt = 0;
+            int placeEmerCnt = 0;
+            int NameCnt = 0;
+
             StringTokenizer str = new StringTokenizer(s, "{\"\":\\/\",\"\":\\/\"}");
             int countTokens = str.countTokens();
             System.out.println("token 수 : " + countTokens);
 
             String[] temp = new String[countTokens];
 
-            for(int i = 0; i < countTokens; i++) {
+            for(int i = 0; i<countTokens; i++) {
                 temp[i] = str.nextToken();
+            }
+
+            for(int i = 0; i < countTokens; i++) {
+
                 System.out.println("**" + i +"번째 토큰 : " + temp[i]);
-                if(temp[i].equals("place") || temp[i].equals("place_emer") || temp[i].equals("null") || temp[i].equals("success")){
+                if(temp[i].equals("place") || temp[i].equals("place_emer") || temp[i].equals("U_name") || temp[i].equals("null") || temp[i].equals("success")){
                 }
                 else{
                     if(i>1){
-                        if(temp[i-1].equals("place") || temp[i-1].equals("place_emer")) {
+                        if(temp[i-1].equals("place")) {
                             if(!temp[i].equals("null")){
-                                longitude[lonCnt] = temp[i];
-                                System.out.println(lonCnt + "번째 lon : " + longitude[lonCnt]);
-                                lonCnt++;
+                                longitude[placeCnt] = temp[i];
+                                latitude[placeCnt] = temp[i+1];
+                                placeType[placeCnt] = 0;
+                                System.out.println(placeCnt + "번째 lon : " + longitude[placeCnt] + " lat : " + latitude[placeCnt]);
+                                placeCnt++;
+                            }
+                        }
+                        else if (temp[i-1].equals("place_emer")) {
+                            if(!temp[i].equals("null")){
+                                longitudeEmer[placeEmerCnt] = temp[i];
+                                latitudeEmer[placeEmerCnt] = temp[i+1];
+                                placeType[placeEmerCnt] = 1;
+                                System.out.println(placeEmerCnt + "번째 긴급 lon : " + longitudeEmer[placeEmerCnt] + " lat : " + latitudeEmer[placeEmerCnt]);
+                                placeEmerCnt++;
+                            }
+                        }
+                        else if (temp[i-1].equals("U_name")) {
+                            if(!temp[i].equals("null")){
+                                name[NameCnt] = temp[i];
+                                System.out.println("이름 : " + name[NameCnt]);
+                                NameCnt++;
                             }
                         }
                         else if(!temp[i-1].equals("place") || !temp[i-1].equals("place_emer") || !temp[i-1].equals("null")){
-                            latitude[latCnt] = temp[i];
-                            System.out.println(latCnt + "번째 lat : " + latitude[latCnt]);
-                            latCnt++;
+//                            latitude[latCnt] = temp[i];
+//                            System.out.println(latCnt + "번째 lat : " + latitude[latCnt]);
+//                            latCnt++;
                         }
                     }
                 }
@@ -381,7 +446,8 @@ public class MainActivity extends AppCompatActivity
 //                        lonCnt++;
 //                    }
             }
-
+            latlonCnt = placeCnt;
+            EmerCnt = placeEmerCnt;
 //            System.out.println("in function get count " + Umailcnt);
         }
     }
@@ -394,6 +460,7 @@ public class MainActivity extends AppCompatActivity
             //StringBuffer에 파라미터 연결
             // 보낼 데이터가 없으면 파라미터를 비운다.
             if (_params == null) {
+                sbParams.append("ReceiverMail=" + ReceiverEmail);
             }
 
             try {
@@ -442,5 +509,35 @@ public class MainActivity extends AppCompatActivity
             return null;
         }
 
+    }
+
+    private void requestMe() {
+        List<String> keys = new ArrayList<>();
+        keys.add("properties.nickname");
+        keys.add("kakao_account.email");
+
+        UserManagement.getInstance().me(keys, new MeV2ResponseCallback() {
+            @Override
+            public void onFailure(ErrorResult errorResult) {
+                String message = "failed to get user info. msg=" + errorResult;
+                Logger.d(message);
+            }
+
+            @Override
+            public void onSessionClosed(ErrorResult errorResult) {
+                Intent i = new Intent(getApplicationContext(), LoginActivity.class);
+                startActivityForResult(i, 0);
+                Toast.makeText(getApplicationContext(), "다시 로그인해주세요", Toast.LENGTH_LONG).show();
+                System.out.println("****** " + errorResult.getErrorMessage());
+            }
+
+            @Override
+            public void onSuccess(MeV2Response response) {
+                //Logger.d("email: " + response.getKakaoAccount().getEmail());
+                ReceiverEmail = response.getKakaoAccount().getEmail();
+                //Toast.makeText(getApplicationContext(), "kakao email : " + response.getKakaoAccount().getEmail(), Toast.LENGTH_LONG).show();
+                System.out.println("@@@@@전송자 정보 : "  + ReceiverEmail);
+            }
+        });
     }
 }
