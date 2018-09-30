@@ -1,27 +1,37 @@
 package com.example.home.secretary_kim;
 
-        import android.content.ContentValues;
-        import android.content.Context;
-        import android.os.AsyncTask;
-        import android.os.Handler;
-        import android.support.annotation.NonNull;
-        import android.support.v7.widget.RecyclerView;
-        import android.view.LayoutInflater;
-        import android.view.ViewGroup;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
+import android.widget.Toast;
 
-        import java.io.BufferedReader;
-        import java.io.IOException;
-        import java.io.InputStreamReader;
-        import java.io.OutputStream;
-        import java.net.HttpURLConnection;
-        import java.net.MalformedURLException;
-        import java.net.URL;
-        import java.util.ArrayList;
-        import java.util.StringTokenizer;
-        import java.util.Timer;
-        import java.util.TimerTask;
+import com.example.home.secretary_kim.LOGIN.LoginActivity;
+import com.kakao.network.ErrorResult;
+import com.kakao.usermgmt.UserManagement;
+import com.kakao.usermgmt.callback.MeV2ResponseCallback;
+import com.kakao.usermgmt.response.MeV2Response;
+import com.kakao.util.helper.log.Logger;
 
-        import static com.google.vr.cardboard.ThreadUtils.runOnUiThread;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import static com.google.vr.cardboard.ThreadUtils.runOnUiThread;
 
 
 public class PointAdapter extends RecyclerView.Adapter<PointHolder> {
@@ -33,21 +43,36 @@ public class PointAdapter extends RecyclerView.Adapter<PointHolder> {
     public static int latlonCnt = 0;
     public static String[] latitudeArray = new String[20];
     public static String[] longitudeArray = new String[20];
+    String ReceiverEmail;
     PointHolder holder;
 
+
+
     public PointAdapter(Context context) {
+        final Handler handler2 = new Handler();
+        new Thread() {
+            public void run() {
+                handler2.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        requestMe();
+                    }
+                }, 10);
+            }
+        }.start();
+
         final Handler handler = new Handler();
         new Thread() {
             public void run() {
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        String url = "http://13.209.64.57:8080/getPlaceList.jsp";
+                        String url = "http://13.209.64.57:8080/getOnlyPlaceList.jsp";
                         NetworkTask networkTask = new NetworkTask(url, null);
                         networkTask.execute();
 
                     }
-                }, 30);
+                }, 400);
             }
         }.start();
 
@@ -88,7 +113,7 @@ public class PointAdapter extends RecyclerView.Adapter<PointHolder> {
         }
 //
 //        list.add(getPoint("맥도날드", 37.5147400f, 127.021924f));
-        list.add(getPoint("집", 129.0929115f, 129.0929115f));
+        list.add(getPoint("0번째", 37.519059f, 129.0929115f));
 //       list.add(getPoint("아오리의 행방불명", 37.519059f, 127.023776f));
 //        list.add(getPoint("키친랩 가로수길점", 37.521601f, 127.021769f));
 //        list.add(getPoint("C27 가로수길점", 37.520711f, 127.023231f));
@@ -143,18 +168,37 @@ public class PointAdapter extends RecyclerView.Adapter<PointHolder> {
             for(int i = 0; i < countTokens; i++) {
                 temp[i] = str.nextToken();
                 System.out.println("**" + i +"번째 토큰 : " + temp[i]);
-
-                if(i % 3 == 0 && i != 0) {
-                    latitudeArray[latCnt] = temp[i];
-                    System.out.println(latCnt + "번째 lat : " + latitudeArray[latCnt]);
-                    latCnt++;
-                } else if(i % 3 == 2 && i != 0) {
-                    longitudeArray[lonCnt] = temp[i];
-                    System.out.println(lonCnt + "번째 lon : " + longitudeArray[lonCnt]);
-                    lonCnt++;
+                if(temp[i].equals("place") || temp[i].equals("place_emer") || temp[i].equals("null") || temp[i].equals("success")){
                 }
+                else{
+                    if(i>1){
+                        if(temp[i-1].equals("place") || temp[i-1].equals("place_emer")) {
+                            if(!temp[i].equals("null")){
+                                longitudeArray[lonCnt] = temp[i];
+                                System.out.println(lonCnt + "번째 lon : " + longitudeArray[lonCnt]);
+                                lonCnt++;
+                            }
+                        }
+                        else if(!temp[i-1].equals("place") || !temp[i-1].equals("place_emer") || !temp[i-1].equals("null")){
+                            latitudeArray[latCnt] = temp[i];
+                            System.out.println(latCnt + "번째 lat : " + latitudeArray[latCnt]);
+                            latCnt++;
+                        }
+                    }
+                }
+
+
+//                    if(i % 3 == 0 && i != 0) {
+//                        latitude[latCnt] = temp[i];
+//                        System.out.println(latCnt + "번째 lat : " + latitude[latCnt]);
+//                        latCnt++;
+//                    } else if(i % 3 == 2 && i != 0) {
+//                        longitude[lonCnt] = temp[i];
+//                        System.out.println(lonCnt + "번째 lon : " + longitude[lonCnt]);
+//                        lonCnt++;
+//                    }
             }
-            latlonCnt = latCnt;
+           latlonCnt = latCnt;
 
 //            System.out.println("in function get count " + Umailcnt);
         }
@@ -168,6 +212,7 @@ public class PointAdapter extends RecyclerView.Adapter<PointHolder> {
             //StringBuffer에 파라미터 연결
             // 보낼 데이터가 없으면 파라미터를 비운다.
             if (_params == null) {
+                sbParams.append("ReceiverMail=" + ReceiverEmail);
             }
 
             try {
@@ -216,6 +261,34 @@ public class PointAdapter extends RecyclerView.Adapter<PointHolder> {
             return null;
         }
 
+    }
+
+
+    private void requestMe() {
+        List<String> keys = new ArrayList<>();
+        keys.add("properties.nickname");
+        keys.add("kakao_account.email");
+
+        UserManagement.getInstance().me(keys, new MeV2ResponseCallback() {
+            @Override
+            public void onFailure(ErrorResult errorResult) {
+                String message = "failed to get user info. msg=" + errorResult;
+                Logger.d(message);
+            }
+
+            @Override
+            public void onSessionClosed(ErrorResult errorResult) {
+                System.out.println("****** " + errorResult.getErrorMessage());
+            }
+
+            @Override
+            public void onSuccess(MeV2Response response) {
+                //Logger.d("email: " + response.getKakaoAccount().getEmail());
+                ReceiverEmail = response.getKakaoAccount().getEmail();
+                //Toast.makeText(getApplicationContext(), "kakao email : " + response.getKakaoAccount().getEmail(), Toast.LENGTH_LONG).show();
+                System.out.println("@@@@@전송자 정보 : "  + ReceiverEmail);
+            }
+        });
     }
 
 }
