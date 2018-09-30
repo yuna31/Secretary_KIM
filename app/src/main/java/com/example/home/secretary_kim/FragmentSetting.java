@@ -17,9 +17,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import static com.example.home.secretary_kim.FragmentSettingActivity.*;
-
-
 public class FragmentSetting extends PreferenceFragmentCompat {
 
     SharedPreferences prefs;
