@@ -3,6 +3,8 @@ package com.example.home.secretary_kim;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -31,6 +33,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by s0woo on 2018-08-20.
@@ -39,8 +42,10 @@ import java.util.List;
 
 public class EmergencyActivity extends AppCompatActivity {
     String SenderEmail; String SenderName;
-//    public LocationClass locationClass;
-//    String loc;
+    public LocationClass locationClass;
+    String loc;
+    String place;
+    String name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,10 +56,17 @@ public class EmergencyActivity extends AppCompatActivity {
 //        locationClass = new LocationClass(EmergencyActivity.this);
 //        locationClass.initLoc();
 //        loc = locationClass.getLoc();
-//        Log.d("EMERGENCY", loc);
 
         //업로드 성공하면 다음 동작 수행해야함
         requestMe();
+
+//        Handler handler1 = new Handler();
+//        handler1.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                place = BluetoothActivity.loc;
+//            }
+//        }, 10);
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -114,14 +126,39 @@ public class EmergencyActivity extends AppCompatActivity {
 
     public class RequestHttpURLConnection {
         public String request(String _url, ContentValues _params) {
+
             HttpURLConnection urlConn = null;
             StringBuffer sbParams = new StringBuffer();
             String userName = SenderName;
             String userID = SenderEmail; //수정할것
             //*******************************************************
-            String place = BluetoothActivity.loc;
-            //String place = "0.0/0.0";
-            String message = SenderName + "님의 긴급호출입니다 (" + place + ")";
+            //String place = BluetoothActivity.loc;
+            String place = "129.1929115f/35.2319312f";
+            System.out.println("place : " + place);
+
+            if (place.length()!= 0) {
+                String[] placeData = place.split("/");
+                for(int i = 0 ; i < placeData.length ; i++) {
+                    System.out.println("data : " + placeData[i]);
+                }
+
+                try {
+                    Geocoder geocoder = new Geocoder(EmergencyActivity.this, Locale.KOREA);
+
+                    List<Address> address = geocoder.getFromLocation(Double.parseDouble(placeData[1]), Double.parseDouble(placeData[0]), 1);
+                    if (address != null && address.size() > 0) {
+                        name = address.get(0).getAddressLine(0).toString();
+                        System.out.println("place name ; " + name);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.e("*","지명에러");
+                }
+            }
+
+
+            String message = SenderName + "님의 긴급호출입니다 (" + name + ")";
+            System.out.println("message : " + message);
 
             //StringBuffer에 파라미터 연결
             // 보낼 데이터가 없으면 파라미터를 비운다.
@@ -206,4 +243,3 @@ public class EmergencyActivity extends AppCompatActivity {
     }
 
 }
-
