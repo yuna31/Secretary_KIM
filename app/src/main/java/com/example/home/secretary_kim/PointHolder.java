@@ -28,7 +28,7 @@ public class PointHolder extends RecyclerView.ViewHolder{
         try {
             Geocoder geocoder = new Geocoder(context, Locale.KOREA);
 
-            List<Address> address = geocoder.getFromLocation(dlati, dlongi, 1);
+            List<Address> address = geocoder.getFromLocation(point.latitude, point.longtitude, 1);
             if (address != null && address.size() > 0) {
                 name = address.get(0).getAddressLine(0).toString();
             }
