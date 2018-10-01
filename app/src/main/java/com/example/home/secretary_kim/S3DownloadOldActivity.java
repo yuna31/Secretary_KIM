@@ -147,7 +147,6 @@ public class S3DownloadOldActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent i = new Intent(getApplicationContext(), MainActivity.class);
                 startActivityForResult(i, 0);
-                finish();
             }
         });
     }
