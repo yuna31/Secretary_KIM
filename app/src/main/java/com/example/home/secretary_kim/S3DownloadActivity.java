@@ -68,6 +68,7 @@ import java.util.List;
 public class S3DownloadActivity extends AppCompatActivity {
     String ReceiverEmail;
     String fileName = "";
+    String userID;
 
     private VrPanoramaView.Options panoOptions = new VrPanoramaView.Options();
 
@@ -157,6 +158,7 @@ public class S3DownloadActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(getApplicationContext(), S3DownloadOldActivity.class);
+                i.putExtra("UserMail", userID);
                 startActivityForResult(i, 0);
                 finish();
             }
@@ -199,7 +201,7 @@ public class S3DownloadActivity extends AppCompatActivity {
         public String request(String _url, ContentValues _params) {
             HttpURLConnection urlConn = null;
             StringBuffer sbParams = new StringBuffer();
-            String userID = getIntent().getStringExtra("UserMail");
+            userID = getIntent().getStringExtra("UserMail");
             String secretaryID = ReceiverEmail; //수정할것
             System.out.println("request user : " + userID + " " +  secretaryID);
 
