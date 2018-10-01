@@ -73,8 +73,6 @@
         <activity android:name=".S3DownloadOldActivity" />
 
         <activity android:name=".MakeUserListActivity" />
-        
-        <activity android:name=".FragmentSettingActivity" />
 
         <activity android:name=".EmergencyActivity"
             android:theme="@style/Transparent">
