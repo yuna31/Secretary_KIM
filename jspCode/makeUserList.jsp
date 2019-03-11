@@ -23,7 +23,7 @@ JSONObject jsonMain = new JSONObject();
 
 String DB_URL = "jdbc:mysql://rds-mysql-s0woo.ap-northeast-2.rds.amazonaws.com:3306/UserConnect";
 String DB_USER = "s0woo";
-String DB_PASSWORD = "123123123";
+String DB_PASSWORD = "";
 
     try {
 Class.forName("com.mysql.jdbc.Driver");
